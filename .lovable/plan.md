@@ -1,62 +1,49 @@
 
-Goal: fix the patient-profile selection UI so all previously selected symptom/history/medication boxes stay visibly highlighted, and expand the final summary to include medications plus allergies with reactions.
+Goal: fix the profile multi-select UI so every selected complaint/history/medication stays visibly highlighted until deselected, and make the summary show complaints in French.
 
 What I found
-- The multi-select state logic already works: `chiefComplaints`, PMH, family history, meds, surgeries, and allergies are being stored correctly in `PatientProfileScreen.tsx`.
-- The likely bug is visual only: the reusable `.compact-btn` CSS in `src/index.css` applies its own background and border, which can override or weaken the selected Tailwind styles (`border-primary bg-primary/10`).
-- The summary screen already shows complaints, medical history, surgeries, and allergies, but:
-  - medications are missing entirely
-  - allergies currently show allergen names only, not reactions
-  - family history is not shown today, though your main request is medications/allergies
+- The toggle logic in `src/screens/PatientProfileScreen.tsx` is already multi-select and correctly adds/removes items from arrays.
+- The fact that selections still appear in the summary strongly suggests this is a rendering/styling issue, not a data issue.
+- The reusable selection UI currently relies on adding Tailwind classes like `border-primary bg-primary/10` on top of `.compact-btn`. That is likely too fragile/inconsistent across all these buttons.
+- In `src/screens/ReviewAndApproveScreen.tsx`, complaints are rendered with `patientProfile.chiefComplaints.join(', ')`, which outputs the stored enum keys (`frequency`, `weak-stream`, etc.) instead of translated French labels.
 
-Implementation plan
-1. Make selected boxes stay visibly selected
-- Update the shared button styling approach used in `PatientProfileScreen.tsx` so selected cards use a stronger, persistent selected state.
-- Best fix: give selectable buttons a dedicated selected variant/class or `data-selected` attribute, then style that in `src/index.css` with higher specificity than the base `.compact-btn`.
-- Apply this consistently to:
+Implementation approach
+1. Centralize selected-state styling
+- In `PatientProfileScreen.tsx`, stop relying on ad hoc `border-primary bg-primary/10` strings.
+- Add a dedicated selected marker such as:
+  - `data-selected={selected.includes(item)}`
+  - or a shared `selected` class
+- Apply it consistently to:
   - chief complaints
-  - past medical history grids
-  - surgical history buttons
+  - PMH grids
+  - surgical options
   - family history
-  - medication selections
-  - diuretics toggle
-  - NKDA toggle
-- Keep the current toggle logic; only the visual state needs to be hardened.
+  - medication options
+  - diuretics
+  - NKDA
 
-2. Update the final summary with medications
-- In `src/screens/ReviewAndApproveScreen.tsx`, derive one combined medication list from:
-  - diabetes meds + “other diabetes meds”
-  - blood thinners
-  - BP meds text entry
-  - diuretics toggle
-  - urologic meds
-  - other prescriptions
-  - supplements + “other supplements”
-- Render that as a single combined summary line, per your preference.
+2. Make selected styling stronger than base button styles
+- Update `src/index.css` so `.compact-btn[data-selected="true"]` (or `.compact-btn.selected`) has a clear persistent active style:
+  - stronger border
+  - tinted background
+  - optional text color / shadow
+- Keep the unselected base appearance unchanged.
+- This ensures multiple selected items stay highlighted at the same time and clicking again removes the highlight.
 
-3. Update the final summary with allergy reactions
-- Keep the existing NKDA behavior.
-- For entered allergies, show each item as `Allergen (Reaction)` when a reaction exists.
-- If reaction is blank, fall back to allergen only so partial entries still display cleanly.
+3. Fix complaints translation in the summary
+- In `ReviewAndApproveScreen.tsx`, map `patientProfile.chiefComplaints` through `t.chiefComplaints[key]` before joining.
+- This will display French labels when the app is in French instead of the raw stored keys.
 
-4. Add/adjust i18n labels for the summary
-- Extend `src/i18n/en.ts` and `src/i18n/fr.ts` review strings with any missing labels needed for:
-  - medications
-  - optionally family history if we decide to expose it while touching the summary
-- No data migration needed.
+4. Verify summary formatting stays correct
+- Keep the existing summary structure for PMH/surgery/allergies/medications.
+- Ensure deselecting an item removes it both from the highlight state and from the final summary output.
 
 Files to update
 - `src/screens/PatientProfileScreen.tsx`
 - `src/index.css`
 - `src/screens/ReviewAndApproveScreen.tsx`
-- `src/i18n/en.ts`
-- `src/i18n/fr.ts`
 
 Expected result
-- Users can select multiple applicable boxes and every selected one remains clearly highlighted.
-- The visual state matches the already-correct stored state.
-- The final summary includes a combined medication list.
-- Allergies in the summary show allergen plus reaction, or NKDA when applicable.
-
-Technical note
-- I would avoid rewriting the form logic; the cleanest fix is to centralize “selected” styling instead of repeating fragile `border-primary bg-primary/10` classes on top of `.compact-btn`.
+- Multiple boxes remain visibly highlighted across complaints, PMH, surgery, family history, and medications.
+- Clicking a selected box again removes the highlight and removes that item from saved selections/summary.
+- Chief complaints appear in French in the summary.
