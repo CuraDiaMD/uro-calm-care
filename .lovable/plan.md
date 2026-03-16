@@ -1,29 +1,24 @@
 
 
-## Fix: Voiding Summary Not Updating
+# Plan: Improve Homepage Readability & Add Demo Reset Button
 
-### Root Cause
-In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
+## Changes
 
-### Solution
-Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
+### 1. Header — Replace Settings icon with Demo Reset button (`src/components/Header.tsx`)
+- Replace `Settings` icon import with `RotateCcw` from lucide-react
+- When not showing step indicator, render a "Reset" button (RotateCcw icon) that clears localStorage and reloads the page
+- Add a confirmation via `window.confirm` before resetting
 
-### File Change: `src/components/home/DailySummaryCard.tsx`
+### 2. Homepage readability improvements (`src/screens/CalendarScreen.tsx`)
+- Increase summary card padding from `p-3` to `p-4`
+- Bump Intake/Voiding value text from `text-2xl` to `text-3xl`
+- Increase section heading sizes from `text-sm` to `text-base`
+- Increase week date picker day numbers from `text-base` to `text-lg`
+- Increase Sleep/Wake label text from `text-[10px]` to `text-xs`, and time input from `text-sm` to `text-base`
+- Increase entry list item text sizes slightly for better readability on mobile
+- Add slightly more vertical gap between sections (`gap-3` → `gap-4`)
 
-Replace the current selectors (lines 5-7):
-```typescript
-const getTodaySummary = useAppStore((state) => state.getTodaySummary);
-const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
-const summary = getTodaySummary();
-```
-
-With:
-```typescript
-const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
-const summary = useAppStore((state) => state.getTodaySummary());
-```
-
-By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
-
-This is a one-line fix -- no other files need to change.
+**Files modified:**
+- `src/components/Header.tsx`
+- `src/screens/CalendarScreen.tsx`
 
