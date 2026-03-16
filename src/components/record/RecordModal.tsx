@@ -37,6 +37,14 @@ export function RecordModal() {
   const [padUsed, setPadUsed] = useState(false);
   const [leakageMemo, setLeakageMemo] = useState('');
   
+  // Symptoms state
+  const [symptoms, setSymptoms] = useState({
+    dysuria: false,
+    pain: false,
+    hematuria: false,
+    fever: false,
+    padUse: 'none' as 'none' | '1-2' | '3+',
+  });
   if (!isRecordOpen) return null;
   
   const resetForm = () => {
