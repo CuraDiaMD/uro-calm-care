@@ -185,7 +185,7 @@ export function CalendarScreen() {
                       {format(new Date(entry.timestamp), 'h:mm a')}
                     </p>
                   </div>
-                  <p className="text-xs font-semibold text-foreground">
+                  <p className="text-sm font-semibold text-foreground">
                     {'volume' in entry && `${entry.volume} mL`}
                     {'size' in entry && !('volume' in entry) && (entry as any).size}
                   </p>
