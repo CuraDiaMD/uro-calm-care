@@ -1,4 +1,4 @@
-import { Settings, ChevronLeft } from 'lucide-react';
+import { RotateCcw, ChevronLeft } from 'lucide-react';
 import logo from '@/assets/curadia-logo.png';
 import { useAppStore } from '@/stores/appStore';
 import type { IntakeStep } from '@/types';
@@ -44,8 +44,17 @@ export function Header({ showBack, showStepIndicator }: HeaderProps) {
             ))}
           </div>
         ) : (
-          <button className="p-2 rounded-full hover:bg-muted transition-colors" aria-label="Settings">
-            <Settings className="w-5 h-5 text-muted-foreground" />
+          <button
+            className="p-2 rounded-full hover:bg-destructive/10 transition-colors"
+            aria-label="Reset Demo"
+            onClick={() => {
+              if (window.confirm('Reset all data and start over?')) {
+                localStorage.clear();
+                window.location.reload();
+              }
+            }}
+          >
+            <RotateCcw className="w-5 h-5 text-destructive" />
           </button>
         )}
       </div>
