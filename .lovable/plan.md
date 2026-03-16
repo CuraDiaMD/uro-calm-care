@@ -1,29 +1,62 @@
+Goal: add small orange shortcut “+” buttons on the intake and voiding cards, restore wake/sleep to their previous separate row, and place a compact editable date selector beside the diary progress bar.
 
+What I found
 
-## Fix: Voiding Summary Not Updating
+- `DailySummaryCard.tsx` currently has one large voiding card and a merged date/wake/sleep row.
+- `CalendarScreen.tsx` still contains the entries list and already reads `selectedDiaryDate` from the global store.
+- `RecordModal` already supports opening directly to `intake` or `voiding` via `openRecordWithTab(...)`.
+- The project already includes the shadcn `Calendar`, `Popover`, and `Button` components needed for an inline date picker.
 
-### Root Cause
-In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
+Implementation plan
 
-### Solution
-Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
+1. Add mini AFB shortcut buttons on the summary cards
 
-### File Change: `src/components/home/DailySummaryCard.tsx`
+- Update `DailySummaryCard.tsx` so both the intake and voiding rectangles have a small orange circular “+” button anchored at the lower-right.
+- Clicking these buttons will call:
+  - `openRecordWithTab('intake')`
+  - `openRecordWithTab('voiding')`
+- Keep the existing leak alert badge on the voiding card in the upper-right.
 
-Replace the current selectors (lines 5-7):
-```typescript
-const getTodaySummary = useAppStore((state) => state.getTodaySummary);
-const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
-const summary = getTodaySummary();
-```
+2. Rebuild the home summary layout
 
-With:
-```typescript
-const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
-const summary = useAppStore((state) => state.getTodaySummary());
-```
+- Replace the current merged date/wake/sleep row in `DailySummaryCard.tsx`.
+- Restore wake and sleep as their own separate row/cards, without the date mixed into that row.
+- Make the main summary area a two-card layout:
+  - intake card
+  - voiding card with leak badge and mini plus shortcut
 
-By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
+3. Put date selection beside the progress bar
 
-This is a one-line fix -- no other files need to change.
+- Update `DiaryStatusCard.tsx` to become a 2-part top row:
+  - right: resized diary progress area
+  - left: compact date selection rectangle taking about one-third of the row
+- Display the date as `dd MMMM yyyy` using the active language/locale.
+- Make the date rectangle pressable and open a shadcn popover calendar to change `selectedDiaryDate`.
 
+4. Use a proper localized date picker
+
+- Use the existing shadcn calendar/popover pattern.
+- Ensure the calendar uses `pointer-events-auto`.
+- Wire selection to `setSelectedDiaryDate`.
+- Use `date-fns` formatting with French locale when the app language is French.
+
+5. Keep the diary screen aligned
+
+- Reuse the same selected date from the store in `CalendarScreen.tsx`.
+- Remove the duplicate standalone date box from the diary screen if the new top-row selector becomes the primary control there, or visually align it with the new compact date-selection pattern.
+- Keep the entries list and leak-in-list behavior unchanged.
+
+Files likely to change
+
+- `src/components/home/DailySummaryCard.tsx`
+- `src/components/home/DiaryStatusCard.tsx`
+- `src/screens/CalendarScreen.tsx`
+- `src/i18n/en.ts`
+- `src/i18n/fr.ts`
+
+Expected result
+
+- Home becomes faster to use with one-tap mini shortcuts for adding intake and voiding.
+- Wake/sleep return to a clearer dedicated row.
+- The selected diary date is visible and editable from a compact top-LEFT date card beside the progress bar.
+- Date formatting matches the requested style and respects French/English locale.
