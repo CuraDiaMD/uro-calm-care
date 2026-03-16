@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { useTranslation } from '@/i18n';
 
 interface QuestionnaireNavProps {
   currentQuestion: number;
@@ -11,42 +12,28 @@ interface QuestionnaireNavProps {
 }
 
 export function QuestionnaireNav({
-  currentQuestion,
-  totalQuestions,
-  canProceed,
-  onBack,
-  onNext,
-  onSubmit,
-  showSubmit = false,
+  currentQuestion, totalQuestions, canProceed, onBack, onNext, onSubmit, showSubmit = false,
 }: QuestionnaireNavProps) {
+  const t = useTranslation();
   const isLastQuestion = currentQuestion === totalQuestions - 1;
   
   return (
     <div className="flex items-center justify-between pt-3 border-t border-border mt-2 flex-shrink-0">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors text-sm"
-      >
+      <button onClick={onBack}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors text-sm">
         <ArrowLeft className="w-3.5 h-3.5" />
-        Back
+        {t.questionnaire.backLabel}
       </button>
-      
       {isLastQuestion || showSubmit ? (
-        <button
-          onClick={onSubmit}
-          disabled={!canProceed}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-50 text-sm"
-        >
-          Submit
+        <button onClick={onSubmit} disabled={!canProceed}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-50 text-sm">
+          {t.questionnaire.submitLabel}
           <CheckCircle className="w-3.5 h-3.5" />
         </button>
       ) : (
-        <button
-          onClick={onNext}
-          disabled={!canProceed}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-primary font-medium disabled:opacity-50 text-sm"
-        >
-          Next
+        <button onClick={onNext} disabled={!canProceed}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-primary font-medium disabled:opacity-50 text-sm">
+          {t.questionnaire.nextLabel}
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       )}

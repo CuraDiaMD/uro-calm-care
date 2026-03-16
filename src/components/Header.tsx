@@ -2,6 +2,7 @@
 import { RotateCcw, ChevronLeft } from 'lucide-react';
 import logo from '@/assets/curadia-logo.png';
 import { useAppStore } from '@/stores/appStore';
+import { useTranslation } from '@/i18n';
 import type { IntakeStep } from '@/types';
 
 interface HeaderProps {
@@ -14,6 +15,9 @@ const STEP_LABELS = ['Consent', 'Consent', 'Consent', 'Profile', 'Questionnaires
 export function Header({ showBack, showStepIndicator }: HeaderProps) {
   const currentIntakeStep = useAppStore((state) => state.currentIntakeStep);
   const setCurrentIntakeStep = useAppStore((state) => state.setCurrentIntakeStep);
+  const language = useAppStore((state) => state.language);
+  const setLanguage = useAppStore((state) => state.setLanguage);
+  const t = useTranslation();
   
   const handleBack = () => {
     if (currentIntakeStep > 0) {
@@ -33,31 +37,43 @@ export function Header({ showBack, showStepIndicator }: HeaderProps) {
           <img src={logo} alt="CuraDia" className="h-10 w-auto" />
         </div>
         
-        {showStepIndicator ? (
-          <div className="flex items-center gap-1">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  i <= currentIntakeStep ? 'bg-primary' : 'bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-        ) : (
+        <div className="flex items-center gap-2">
+          {/* Language Toggle */}
           <button
-            className="p-2 rounded-full hover:bg-destructive/10 transition-colors"
-            aria-label="Reset Demo"
-            onClick={() => {
-              if (window.confirm('Reset all data and start over?')) {
-                localStorage.clear();
-                window.location.reload();
-              }
-            }}
+            onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
+            className="flex items-center gap-0.5 px-2 py-1 rounded-lg text-xs font-semibold border border-border hover:bg-muted transition-colors"
           >
-            <RotateCcw className="w-5 h-5 text-destructive" />
+            <span className={language === 'en' ? 'text-primary' : 'text-muted-foreground'}>EN</span>
+            <span className="text-muted-foreground">|</span>
+            <span className={language === 'fr' ? 'text-primary' : 'text-muted-foreground'}>FR</span>
           </button>
-        )}
+          
+          {showStepIndicator ? (
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    i <= currentIntakeStep ? 'bg-primary' : 'bg-muted'
+                  }`}
+                />
+              ))}
+            </div>
+          ) : (
+            <button
+              className="p-2 rounded-full hover:bg-destructive/10 transition-colors"
+              aria-label="Reset Demo"
+              onClick={() => {
+                if (window.confirm(t.header.resetConfirm)) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }}
+            >
+              <RotateCcw className="w-5 h-5 text-destructive" />
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

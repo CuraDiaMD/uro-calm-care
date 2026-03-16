@@ -1,121 +1,78 @@
 import { useState } from 'react';
 import { ShieldCheck, Brain, Bell } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
+import { useTranslation } from '@/i18n';
 import { toast } from 'sonner';
 import type { IntakeStep, Consent } from '@/types';
-
-const CONSENT_SCREENS = [
-  {
-    icon: ShieldCheck,
-    title: 'Clinical Data Consent',
-    subtitle: 'Required to proceed',
-    required: true,
-    description:
-      'Your health information will be securely stored and shared with your clinical care team to support your diagnosis and treatment.',
-    details: [
-      'Your profile, questionnaire scores, and diary data will be accessible to your care team',
-      'Data is encrypted and stored in compliance with healthcare privacy regulations',
-      'You can request data deletion at any time by contacting your clinic',
-    ],
-    field: 'clinicalData' as const,
-  },
-  {
-    icon: Brain,
-    title: 'Research & AI Training',
-    subtitle: 'Optional',
-    required: false,
-    description:
-      'Help improve urological care by allowing your anonymized data to be used for medical research and AI model training.',
-    details: [
-      'All data is fully anonymized before use — your identity is never linked',
-      'Contributes to better diagnostic tools and treatment recommendations',
-      'You can withdraw consent at any time without affecting your care',
-    ],
-    field: 'researchData' as const,
-  },
-  {
-    icon: Bell,
-    title: 'Communication Preferences',
-    subtitle: 'Optional',
-    required: false,
-    description:
-      'Allow your care team to send you reminders and updates about your diary, appointments, and health tips.',
-    details: [
-      'Receive diary reminders to help you complete your 3-day voiding diary',
-      'Get appointment notifications and follow-up messages',
-      'You can unsubscribe at any time',
-    ],
-    field: 'communication' as const,
-  },
-];
 
 export function ConsentScreen() {
   const currentIntakeStep = useAppStore((state) => state.currentIntakeStep);
   const setCurrentIntakeStep = useAppStore((state) => state.setCurrentIntakeStep);
   const consents = useAppStore((state) => state.consents);
   const setConsents = useAppStore((state) => state.setConsents);
+  const t = useTranslation();
   
-  // currentIntakeStep 0-2 maps to consent sub-screens 0-2
+  const CONSENT_SCREENS = [
+    {
+      icon: ShieldCheck,
+      title: t.consent.clinicalTitle,
+      subtitle: t.consent.clinicalSubtitle,
+      required: true,
+      description: t.consent.clinicalDesc,
+      details: [t.consent.clinicalDetail1, t.consent.clinicalDetail2, t.consent.clinicalDetail3],
+      field: 'clinicalData' as const,
+    },
+    {
+      icon: Brain,
+      title: t.consent.researchTitle,
+      subtitle: t.consent.researchSubtitle,
+      required: false,
+      description: t.consent.researchDesc,
+      details: [t.consent.researchDetail1, t.consent.researchDetail2, t.consent.researchDetail3],
+      field: 'researchData' as const,
+    },
+    {
+      icon: Bell,
+      title: t.consent.commTitle,
+      subtitle: t.consent.commSubtitle,
+      required: false,
+      description: t.consent.commDesc,
+      details: [t.consent.commDetail1, t.consent.commDetail2, t.consent.commDetail3],
+      field: 'communication' as const,
+    },
+  ];
+
   const screenIndex = currentIntakeStep;
   const screen = CONSENT_SCREENS[screenIndex];
   const Icon = screen.icon;
   
   const handleAccept = () => {
     const current: Consent = consents || {
-      clinicalData: false,
-      researchData: false,
-      communication: false,
-      timestamps: {},
+      clinicalData: false, researchData: false, communication: false, timestamps: {},
     };
-    
     const updated: Consent = {
-      ...current,
-      [screen.field]: true,
-      timestamps: {
-        ...current.timestamps,
-        [screen.field.replace('Data', '').replace('communication', 'communication')]: new Date(),
-      },
+      ...current, [screen.field]: true, timestamps: { ...current.timestamps },
     };
-    
-    // Fix timestamp keys
     if (screen.field === 'clinicalData') updated.timestamps.clinical = new Date();
     if (screen.field === 'researchData') updated.timestamps.research = new Date();
     if (screen.field === 'communication') updated.timestamps.communication = new Date();
-    
     setConsents(updated);
-    
-    if (screenIndex < 2) {
-      setCurrentIntakeStep((screenIndex + 1) as IntakeStep);
-    } else {
-      setCurrentIntakeStep(3);
-    }
+    if (screenIndex < 2) setCurrentIntakeStep((screenIndex + 1) as IntakeStep);
+    else setCurrentIntakeStep(3);
   };
   
   const handleDecline = () => {
     if (screen.required) {
-      toast.error('Clinical data consent is required to proceed.');
+      toast.error(t.consent.requiredError);
       return;
     }
-    
     const current: Consent = consents || {
-      clinicalData: false,
-      researchData: false,
-      communication: false,
-      timestamps: {},
+      clinicalData: false, researchData: false, communication: false, timestamps: {},
     };
-    
-    const updated: Consent = {
-      ...current,
-      [screen.field]: false,
-    };
-    
+    const updated: Consent = { ...current, [screen.field]: false };
     setConsents(updated);
-    
-    if (screenIndex < 2) {
-      setCurrentIntakeStep((screenIndex + 1) as IntakeStep);
-    } else {
-      setCurrentIntakeStep(3);
-    }
+    if (screenIndex < 2) setCurrentIntakeStep((screenIndex + 1) as IntakeStep);
+    else setCurrentIntakeStep(3);
   };
   
   return (
@@ -132,10 +89,8 @@ export function ConsentScreen() {
             </p>
           </div>
         </div>
-        
         <div className="compact-card space-y-3">
           <p className="text-sm text-foreground leading-relaxed">{screen.description}</p>
-          
           <ul className="space-y-2">
             {screen.details.map((detail, i) => (
               <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -146,32 +101,21 @@ export function ConsentScreen() {
           </ul>
         </div>
       </div>
-      
       <div className="flex gap-3 flex-shrink-0">
-        <button
-          onClick={handleDecline}
+        <button onClick={handleDecline}
           className={`flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition-all active:scale-[0.98] ${
-            screen.required
-              ? 'border-muted text-muted-foreground opacity-50'
-              : 'border-border text-foreground hover:bg-muted'
-          }`}
-        >
-          I Decline
+            screen.required ? 'border-muted text-muted-foreground opacity-50' : 'border-border text-foreground hover:bg-muted'
+          }`}>
+          {t.consent.decline}
         </button>
-        <button
-          onClick={handleAccept}
-          className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
-        >
-          I Accept
+        <button onClick={handleAccept}
+          className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform">
+          {t.consent.accept}
         </button>
       </div>
-      
       <div className="flex justify-center gap-1.5 flex-shrink-0">
         {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={`w-2 h-2 rounded-full ${i === screenIndex ? 'bg-primary' : 'bg-muted'}`}
-          />
+          <div key={i} className={`w-2 h-2 rounded-full ${i === screenIndex ? 'bg-primary' : 'bg-muted'}`} />
         ))}
       </div>
     </div>

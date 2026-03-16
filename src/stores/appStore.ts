@@ -62,6 +62,10 @@ export const EMPTY_PROFILE: PatientProfile = {
 };
 
 interface AppState {
+  // Language
+  language: 'en' | 'fr';
+  setLanguage: (lang: 'en' | 'fr') => void;
+  
   // Navigation
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
@@ -147,6 +151,9 @@ const getLeakageVolume = (size: 'drops' | 'small' | 'large') => {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      language: 'en' as 'en' | 'fr',
+      setLanguage: (lang: 'en' | 'fr') => set({ language: lang }),
+      
       activeTab: 'diary',
       setActiveTab: (tab) => set({ activeTab: tab }),
       
@@ -259,6 +266,7 @@ export const useAppStore = create<AppState>()(
     {
       name: 'curadia-storage',
       partialize: (state) => ({
+        language: state.language,
         intakeStatus: state.intakeStatus,
         currentIntakeStep: state.currentIntakeStep,
         patientProfile: state.patientProfile,

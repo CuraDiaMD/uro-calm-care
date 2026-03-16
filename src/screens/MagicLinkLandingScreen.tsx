@@ -1,9 +1,11 @@
 import logo from '@/assets/curadia-logo.png';
 import { useAppStore } from '@/stores/appStore';
+import { useTranslation } from '@/i18n';
 
 export function MagicLinkLandingScreen() {
   const setIntakeStatus = useAppStore((state) => state.setIntakeStatus);
   const setCurrentIntakeStep = useAppStore((state) => state.setCurrentIntakeStep);
+  const t = useTranslation();
   
   const handleStart = () => {
     setIntakeStatus('in-progress');
@@ -16,32 +18,28 @@ export function MagicLinkLandingScreen() {
         <img src={logo} alt="CuraDia Uro-OS" className="h-16 w-auto" />
         
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-foreground">
-            Welcome to Uro-OS
-          </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Your clinic has invited you to complete a pre-visit intake. This will help your care team understand your symptoms better before your appointment.
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">{t.landing.welcome}</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t.landing.description}</p>
         </div>
         
         <div className="compact-card w-full space-y-2 text-left">
-          <p className="text-xs font-semibold text-foreground">What to expect:</p>
+          <p className="text-xs font-semibold text-foreground">{t.landing.whatToExpect}</p>
           <ul className="text-xs text-muted-foreground space-y-1.5">
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">1.</span>
-              <span>Consent &amp; privacy preferences</span>
+              <span>{t.landing.step1}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">2.</span>
-              <span>Your health profile &amp; history</span>
+              <span>{t.landing.step2}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">3.</span>
-              <span>Validated symptom questionnaires</span>
+              <span>{t.landing.step3}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">4.</span>
-              <span>3-day voiding diary</span>
+              <span>{t.landing.step4}</span>
             </li>
           </ul>
         </div>
@@ -50,12 +48,10 @@ export function MagicLinkLandingScreen() {
           onClick={handleStart}
           className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base active:scale-[0.98] transition-transform shadow-[var(--shadow-fab)]"
         >
-          Start Intake
+          {t.landing.startIntake}
         </button>
         
-        <p className="text-[10px] text-muted-foreground">
-          Your data is encrypted and only shared with your care team.
-        </p>
+        <p className="text-[10px] text-muted-foreground">{t.landing.encrypted}</p>
       </div>
     </div>
   );
