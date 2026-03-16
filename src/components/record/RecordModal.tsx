@@ -15,7 +15,7 @@ const beverages: { type: BeverageType; icon: typeof Droplet; label: string }[] =
 ];
 
 export function RecordModal() {
-  const { isRecordOpen, setRecordOpen, recordTab, setRecordTab, addIntakeEntry, addVoidingEntry, addLeakageEntry } = useAppStore();
+  const { isRecordOpen, setRecordOpen, recordTab, setRecordTab, addIntakeEntry, addVoidingEntry, addLeakageEntry, addDailySymptomCheck } = useAppStore();
   
   // Intake state
   const [selectedBeverage, setSelectedBeverage] = useState<BeverageType | null>(null);
