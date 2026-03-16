@@ -1,24 +1,23 @@
-import { Droplets, Activity, AlertCircle, Moon, Sun } from 'lucide-react';
+import { Droplets, Activity, AlertCircle, Moon, Sun, Plus } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { format, isSameDay } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
+import { DiaryStatusCard } from '@/components/home/DiaryStatusCard';
 
 export function CalendarScreen() {
   const intakeEntries = useAppStore((state) => state.intakeEntries);
   const voidingEntries = useAppStore((state) => state.voidingEntries);
   const leakageEntries = useAppStore((state) => state.leakageEntries);
-  const diaryStartDate = useAppStore((state) => state.diaryStartDate);
   const selectedDate = useAppStore((state) => state.selectedDiaryDate);
   const sleepTime = useAppStore((state) => state.sleepTime);
   const wakeTime = useAppStore((state) => state.wakeTime);
   const setSleepWakeTimes = useAppStore((state) => state.setSleepWakeTimes);
-  const getDiaryDaysCompleted = useAppStore((state) => state.getDiaryDaysCompleted);
   const getSummaryForDate = useAppStore((state) => state.getSummaryForDate);
+  const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
   const language = useAppStore((state) => state.language);
   const t = useTranslation();
 
-  const daysCompleted = getDiaryDaysCompleted();
   const locale = language === 'fr' ? frLocale : undefined;
   const dayIntakes = intakeEntries.filter((e) => isSameDay(new Date(e.timestamp), selectedDate));
   const dayVoidings = voidingEntries.filter((e) => isSameDay(new Date(e.timestamp), selectedDate));
@@ -28,20 +27,7 @@ export function CalendarScreen() {
 
   return (
     <div className="screen-container gap-4">
-      {diaryStartDate && (
-        <div className="compact-card flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-base font-semibold text-foreground">{t.diary.diaryProgress}</h2>
-            <span className="text-xs font-medium text-primary">{Math.min(daysCompleted, 3)}/3 {t.diary.days}</span>
-          </div>
-          <div className="w-full bg-muted rounded-full h-2">
-            <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${(Math.min(daysCompleted, 3) / 3) * 100}%` }} />
-          </div>
-          {daysCompleted >= 3 && (
-            <p className="text-xs text-success mt-1.5 font-medium">{t.diary.diaryComplete}</p>
-          )}
-        </div>
-      )}
+      <DiaryStatusCard />
 
       <div className="compact-card grid grid-cols-2 gap-3 flex-shrink-0">
         <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
@@ -65,38 +51,71 @@ export function CalendarScreen() {
       </div>
 
       <div className="grid grid-cols-2 gap-2 flex-shrink-0">
-        <div className="compact-card">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Droplets className="w-3.5 h-3.5 text-secondary" />
-            <span className="text-xs font-medium text-foreground">{t.calendar.intake}</span>
+        <div className="relative rounded-xl border border-border bg-secondary/5 p-4 min-h-[148px] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-1.5 mb-2">
+              <Droplets className="w-4 h-4 text-secondary" />
+              <h3 className="text-sm font-semibold text-foreground">{t.calendar.intake}</h3>
+            </div>
+            <p className="text-3xl font-bold text-foreground">{summary.totalIntake}</p>
+            <p className="text-sm text-muted-foreground">{t.calendar.mlTotal}</p>
           </div>
-          <p className="text-3xl font-bold text-foreground">{summary.totalIntake}</p>
-          <p className="text-xs text-muted-foreground">{t.calendar.mlTotal}</p>
+
+          <button
+            onClick={() => openRecordWithTab('intake')}
+            aria-label={`Add ${t.record.intake}`}
+            className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-warning text-primary-foreground shadow-sm transition-all hover:scale-105 active:scale-95"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
         </div>
-        <div className="compact-card relative">
+
+        <div className="relative rounded-xl border border-primary/10 bg-primary/5 p-4 min-h-[148px] flex flex-col justify-between">
           {hasLeakage && (
             <div className="absolute right-3 top-3 w-8 h-8 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center">
               <AlertCircle className="w-4 h-4 text-destructive" />
             </div>
           )}
-          <div className="flex items-center gap-1.5 mb-1 pr-10">
-            <Activity className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-medium text-foreground">{t.calendar.voiding}</span>
+
+          <div>
+            <div className="flex items-center gap-1.5 mb-2 pr-10">
+              <Activity className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-primary">{t.calendar.voiding}</h3>
+            </div>
+            <p className="text-3xl font-bold text-foreground">{summary.totalVoided}</p>
+            <p className="text-sm text-muted-foreground">{t.home.totalMl}</p>
           </div>
-          <p className="text-3xl font-bold text-foreground">{summary.totalVoided}</p>
-          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-            <span>{summary.daytimeFrequency} {t.home.day}</span>
-            <span>{summary.nighttimeFrequency} {t.home.night}</span>
+
+          <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <Sun className="w-5 h-5 text-warning" />
+              <div>
+                <p className="text-2xl font-semibold text-foreground">{summary.daytimeFrequency}</p>
+                <p className="text-xs text-muted-foreground">{t.home.day}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Moon className="w-5 h-5 text-secondary" />
+              <div>
+                <p className="text-2xl font-semibold text-foreground">{summary.nighttimeFrequency}</p>
+                <p className="text-xs text-muted-foreground">{t.home.night}</p>
+              </div>
+            </div>
           </div>
+
+          <button
+            onClick={() => openRecordWithTab('voiding')}
+            aria-label={`Add ${t.record.voiding}`}
+            className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-warning text-primary-foreground shadow-sm transition-all hover:scale-105 active:scale-95"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between gap-3 mb-2 flex-shrink-0">
           <h3 className="text-base font-semibold text-foreground">{t.calendar.entries}</h3>
-          <p className="text-xs text-muted-foreground capitalize">
-            {format(new Date(selectedDate), 'dd MMMM yyyy', { locale })}
-          </p>
         </div>
         {dayIntakes.length === 0 && dayVoidings.length === 0 && dayLeakages.length === 0 ? (
           <div className="compact-card text-center py-4 flex-shrink-0">
