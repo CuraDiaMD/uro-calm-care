@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Droplet, Coffee, CupSoda, Citrus, Beer, GlassWater } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { VOLUME_PRESETS, URGE_SCALE_LABELS, type BeverageType, type LeakageSize, type LeakageType, type RecordTab } from '@/types';
+import type { DailySymptomCheck } from '@/types';
 import { toast } from 'sonner';
 
 const beverages: { type: BeverageType; icon: typeof Droplet; label: string }[] = [
@@ -14,7 +15,7 @@ const beverages: { type: BeverageType; icon: typeof Droplet; label: string }[] =
 ];
 
 export function RecordModal() {
-  const { isRecordOpen, setRecordOpen, recordTab, setRecordTab, addIntakeEntry, addVoidingEntry, addLeakageEntry } = useAppStore();
+  const { isRecordOpen, setRecordOpen, recordTab, setRecordTab, addIntakeEntry, addVoidingEntry, addLeakageEntry, addDailySymptomCheck } = useAppStore();
   
   // Intake state
   const [selectedBeverage, setSelectedBeverage] = useState<BeverageType | null>(null);
@@ -36,6 +37,14 @@ export function RecordModal() {
   const [padUsed, setPadUsed] = useState(false);
   const [leakageMemo, setLeakageMemo] = useState('');
   
+  // Symptoms state
+  const [symptoms, setSymptoms] = useState({
+    dysuria: false,
+    pain: false,
+    hematuria: false,
+    fever: false,
+    padUse: 'none' as 'none' | '1-2' | '3+',
+  });
   if (!isRecordOpen) return null;
   
   const resetForm = () => {
@@ -53,6 +62,7 @@ export function RecordModal() {
     setLeakageType('unknown');
     setPadUsed(false);
     setLeakageMemo('');
+    setSymptoms({ dysuria: false, pain: false, hematuria: false, fever: false, padUse: 'none' });
   };
   
   const handleSave = () => {
@@ -77,7 +87,7 @@ export function RecordModal() {
         memo: voidMemo || undefined,
       });
       toast.success('Voiding entry saved');
-    } else {
+    } else if (recordTab === 'leakage') {
       addLeakageEntry({
         size: leakageSize,
         activity: leakageActivity,
@@ -86,6 +96,13 @@ export function RecordModal() {
         memo: leakageMemo || undefined,
       });
       toast.success('Leakage entry saved');
+    } else if (recordTab === 'symptoms') {
+      const check: DailySymptomCheck = {
+        date: new Date(),
+        ...symptoms,
+      };
+      addDailySymptomCheck(check);
+      toast.success('Symptoms saved');
     }
     
     resetForm();
@@ -108,11 +125,11 @@ export function RecordModal() {
         
         {/* Tabs */}
         <div className="flex border-b border-border flex-shrink-0">
-          {(['intake', 'voiding', 'leakage'] as RecordTab[]).map((tab) => (
+          {(['intake', 'voiding', 'leakage', 'symptoms'] as RecordTab[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setRecordTab(tab)}
-              className={`tab-btn py-2 text-sm ${recordTab === tab ? 'active' : ''}`}
+              className={`tab-btn py-2 text-xs ${recordTab === tab ? 'active' : ''}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -306,6 +323,49 @@ export function RecordModal() {
                   onChange={(e) => setLeakageMemo(e.target.value)}
                   className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none h-14 text-sm"
                 />
+              </div>
+            </div>
+          )}
+          
+          {recordTab === 'symptoms' && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Symptoms Today</label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { key: 'dysuria', label: 'Painful urination' },
+                    { key: 'pain', label: 'Pelvic pain' },
+                    { key: 'hematuria', label: 'Blood in urine' },
+                    { key: 'fever', label: 'Fever' },
+                  ].map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setSymptoms(s => ({ ...s, [key]: !s[key as keyof typeof s] }))}
+                      className={`compact-btn py-3 text-left ${
+                        symptoms[key as keyof typeof symptoms] ? 'border-destructive bg-destructive/10' : ''
+                      }`}
+                    >
+                      <span className="text-xs font-medium text-foreground">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Pad use today</label>
+                <div className="flex gap-1.5">
+                  {(['none', '1-2', '3+'] as const).map((val) => (
+                    <button
+                      key={val}
+                      onClick={() => setSymptoms(s => ({ ...s, padUse: val }))}
+                      className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all ${
+                        symptoms.padUse === val ? 'border-primary bg-primary/10 text-primary' : 'border-border'
+                      }`}
+                    >
+                      {val}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}

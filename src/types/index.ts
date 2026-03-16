@@ -8,7 +8,7 @@ export type LeakageType = 'stress' | 'urge' | 'mixed' | 'unknown';
 
 export type TabType = 'diary' | 'record' | 'forms' | 'summary';
 
-export type RecordTab = 'intake' | 'voiding' | 'leakage';
+export type RecordTab = 'intake' | 'voiding' | 'leakage' | 'symptoms';
 
 export type IntakeStatus = 'not-started' | 'in-progress' | 'completed';
 

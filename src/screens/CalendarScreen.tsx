@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Droplets, Activity, AlertCircle, Moon, Sun, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Droplets, Activity, AlertCircle, Moon, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
-import type { DailySymptomCheck } from '@/types';
 
 export function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -14,28 +13,8 @@ export function CalendarScreen() {
   const wakeTime = useAppStore((state) => state.wakeTime);
   const setSleepWakeTimes = useAppStore((state) => state.setSleepWakeTimes);
   const getDiaryDaysCompleted = useAppStore((state) => state.getDiaryDaysCompleted);
-  const dailySymptomChecks = useAppStore((state) => state.dailySymptomChecks);
-  const addDailySymptomCheck = useAppStore((state) => state.addDailySymptomCheck);
   
   const daysCompleted = getDiaryDaysCompleted();
-  
-  // Symptom check state for today
-  const todayCheck = dailySymptomChecks.find(c => isSameDay(new Date(c.date), selectedDate));
-  const [symptoms, setSymptoms] = useState({
-    dysuria: todayCheck?.dysuria || false,
-    pain: todayCheck?.pain || false,
-    hematuria: todayCheck?.hematuria || false,
-    fever: todayCheck?.fever || false,
-    padUse: todayCheck?.padUse || 'none' as 'none' | '1-2' | '3+',
-  });
-  
-  const handleSaveSymptoms = () => {
-    const check: DailySymptomCheck = {
-      date: selectedDate,
-      ...symptoms,
-    };
-    addDailySymptomCheck(check);
-  };
   
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(subDays(selectedDate, 3), i));
   
@@ -152,8 +131,8 @@ export function CalendarScreen() {
             <Droplets className="w-3.5 h-3.5 text-secondary" />
             <span className="text-xs font-medium text-foreground">Intake</span>
           </div>
-          <p className="text-xl font-bold text-foreground">{summary.totalIntake}</p>
-          <p className="text-[10px] text-muted-foreground">mL total</p>
+          <p className="text-2xl font-bold text-foreground">{summary.totalIntake}</p>
+          <p className="text-xs text-muted-foreground">mL total</p>
         </div>
         
         <div className="compact-card">
@@ -161,8 +140,8 @@ export function CalendarScreen() {
             <Activity className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs font-medium text-foreground">Voiding</span>
           </div>
-          <p className="text-xl font-bold text-foreground">{summary.totalVoided}</p>
-          <p className="text-[10px] text-muted-foreground">{summary.voidCount} voids</p>
+          <p className="text-2xl font-bold text-foreground">{summary.totalVoided}</p>
+          <p className="text-xs text-muted-foreground">{summary.voidCount} voids</p>
         </div>
       </div>
       
@@ -177,58 +156,6 @@ export function CalendarScreen() {
           </div>
         </div>
       )}
-      
-      {/* Daily Symptom Check */}
-      <div className="compact-card flex-shrink-0 space-y-2">
-        <h3 className="text-sm font-semibold text-foreground">Daily Symptom Check</h3>
-        <div className="grid grid-cols-2 gap-1.5">
-          {[
-            { key: 'dysuria', label: 'Painful urination' },
-            { key: 'pain', label: 'Pelvic pain' },
-            { key: 'hematuria', label: 'Blood in urine' },
-            { key: 'fever', label: 'Fever' },
-          ].map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setSymptoms(s => ({ ...s, [key]: !s[key as keyof typeof s] }))}
-              className={`compact-btn py-2 text-left ${
-                symptoms[key as keyof typeof symptoms] ? 'border-destructive bg-destructive/10' : ''
-              }`}
-            >
-              <span className="text-[11px] font-medium text-foreground">{label}</span>
-            </button>
-          ))}
-        </div>
-        
-        <div>
-          <label className="text-[11px] font-medium text-foreground mb-1 block">Pad use today</label>
-          <div className="flex gap-1.5">
-            {(['none', '1-2', '3+'] as const).map((val) => (
-              <button
-                key={val}
-                onClick={() => setSymptoms(s => ({ ...s, padUse: val }))}
-                className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                  symptoms.padUse === val ? 'border-primary bg-primary/10 text-primary' : 'border-border'
-                }`}
-              >
-                {val}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {!todayCheck && (
-          <button
-            onClick={handleSaveSymptoms}
-            className="w-full py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold"
-          >
-            Save Symptom Check
-          </button>
-        )}
-        {todayCheck && (
-          <p className="text-[10px] text-success font-medium">✅ Symptoms logged for this day</p>
-        )}
-      </div>
       
       {/* Recent Entries */}
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
