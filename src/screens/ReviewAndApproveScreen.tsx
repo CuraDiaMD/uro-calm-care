@@ -27,8 +27,10 @@ export function ReviewAndApproveScreen() {
   const pmhItems: string[] = [];
   if (patientProfile) {
     const pmh = patientProfile.pastMedicalHistory;
-    pmhItems.push(...pmh.endocrine, ...pmh.cardiovascular, ...pmh.neurological, ...pmh.kidneyUrologic, ...pmh.cancer, ...pmh.other);
-    if (pmh.cancerOther) pmhItems.push(pmh.cancerOther);
+    if (pmh && typeof pmh === 'object' && !Array.isArray(pmh)) {
+      pmhItems.push(...(pmh.endocrine || []), ...(pmh.cardiovascular || []), ...(pmh.neurological || []), ...(pmh.kidneyUrologic || []), ...(pmh.cancer || []), ...(pmh.other || []));
+      if (pmh.cancerOther) pmhItems.push(pmh.cancerOther);
+    }
   }
   
   return (
