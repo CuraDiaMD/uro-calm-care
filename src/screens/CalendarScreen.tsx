@@ -35,7 +35,7 @@ export function CalendarScreen() {
       {diaryStartDate && (
         <div className="compact-card flex-shrink-0">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-foreground">3-Day Diary Progress</h2>
+            <h2 className="text-base font-semibold text-foreground">3-Day Diary Progress</h2>
             <span className="text-xs font-medium text-primary">{Math.min(daysCompleted, 3)}/3 days</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2">
