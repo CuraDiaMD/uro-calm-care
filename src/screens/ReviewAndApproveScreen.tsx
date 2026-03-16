@@ -83,7 +83,7 @@ export function ReviewAndApproveScreen() {
             <div className="text-xs text-muted-foreground space-y-1">
               <p><span className="text-foreground font-medium">{t.review.name}:</span> {patientProfile.firstName} {patientProfile.lastName}</p>
               <p><span className="text-foreground font-medium">{t.review.sex}:</span> {patientProfile.sexAtBirth}</p>
-              <p><span className="text-foreground font-medium">{t.review.complaintsLabel}:</span> {patientProfile.chiefComplaints.join(', ')}</p>
+              <p><span className="text-foreground font-medium">{t.review.complaintsLabel}:</span> {patientProfile.chiefComplaints.map((complaint) => t.chiefComplaints[complaint] || complaint).join(', ')}</p>
               {pmhItems.length > 0 && (
                 <p><span className="text-foreground font-medium">{t.review.medicalHx}:</span> {pmhItems.join(', ')}</p>
               )}
@@ -97,7 +97,7 @@ export function ReviewAndApproveScreen() {
                 <p><span className="text-foreground font-medium">{t.review.allergiesLabel}:</span> {t.review.nkda}</p>
               )}
               {(patientProfile.allergies?.entries?.length || 0) > 0 && (
-                <p><span className="text-foreground font-medium">{t.review.allergiesLabel}:</span> {patientProfile.allergies.entries.map(a => a.allergen).join(', ')}</p>
+                <p><span className="text-foreground font-medium">{t.review.allergiesLabel}:</span> {patientProfile.allergies.entries.map(a => a.reaction ? `${a.allergen} (${a.reaction})` : a.allergen).join(', ')}</p>
               )}
             </div>
           ) : (

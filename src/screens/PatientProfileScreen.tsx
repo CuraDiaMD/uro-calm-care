@@ -107,11 +107,22 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
 
   const CheckboxGrid = ({ items, selected, onToggle, cols = 2 }: { items: readonly string[]; selected: string[]; onToggle: (item: string) => void; cols?: number }) => (
     <div className={`grid gap-1.5 ${cols === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-      {items.map(item => (
-        <button key={item} onClick={() => onToggle(item)} className={`compact-btn py-2 text-left ${selected.includes(item) ? 'border-primary bg-primary/10' : ''}`}>
-          <span className="text-[11px] font-medium text-foreground">{item}</span>
-        </button>
-      ))}
+      {items.map(item => {
+        const isSelected = selected.includes(item);
+
+        return (
+          <button
+            key={item}
+            type="button"
+            data-selected={isSelected}
+            aria-pressed={isSelected}
+            onClick={() => onToggle(item)}
+            className="compact-btn py-2 text-left"
+          >
+            <span className="text-[11px] font-medium text-foreground">{item}</span>
+          </button>
+        );
+      })}
     </div>
   );
 
@@ -170,12 +181,22 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.sexAtBirth} *</label>
               <div className="grid grid-cols-3 gap-2">
-                {(['male', 'female', 'other'] as SexAtBirth[]).map((sex) => (
-                  <button key={sex} onClick={() => updateField('sexAtBirth', sex)}
-                    className={`compact-btn py-2.5 ${profile.sexAtBirth === sex ? 'border-primary bg-primary/10' : ''}`}>
-                    <span className="text-sm font-medium">{sexLabels[sex]}</span>
-                  </button>
-                ))}
+                {(['male', 'female', 'other'] as SexAtBirth[]).map((sex) => {
+                  const isSelected = profile.sexAtBirth === sex;
+
+                  return (
+                    <button
+                      key={sex}
+                      type="button"
+                      data-selected={isSelected}
+                      aria-pressed={isSelected}
+                      onClick={() => updateField('sexAtBirth', sex)}
+                      className="compact-btn py-2.5"
+                    >
+                      <span className="text-sm font-medium">{sexLabels[sex]}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div>
@@ -206,12 +227,22 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             <h2 className="text-lg font-semibold text-foreground">{t.profile.chiefComplaints}</h2>
             <p className="text-xs text-muted-foreground">{t.profile.selectAllApply}</p>
             <div className="grid grid-cols-2 gap-2">
-              {(Object.keys(t.chiefComplaints) as ChiefComplaint[]).map((key) => (
-                <button key={key} onClick={() => toggleComplaint(key)}
-                  className={`compact-btn py-2.5 text-left ${profile.chiefComplaints.includes(key) ? 'border-primary bg-primary/10' : ''}`}>
-                  <span className="text-xs font-medium text-foreground">{t.chiefComplaints[key]}</span>
-                </button>
-              ))}
+              {(Object.keys(t.chiefComplaints) as ChiefComplaint[]).map((key) => {
+                const isSelected = profile.chiefComplaints.includes(key);
+
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    data-selected={isSelected}
+                    aria-pressed={isSelected}
+                    onClick={() => toggleComplaint(key)}
+                    className="compact-btn py-2.5 text-left"
+                  >
+                    <span className="text-xs font-medium text-foreground">{t.chiefComplaints[key]}</span>
+                  </button>
+                );
+              })}
             </div>
           </>
         )}
@@ -246,8 +277,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               const entry = profile.pastSurgicalHistory.urologic.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
-                  <button onClick={() => toggleSurgery('urologic', name)}
-                    className={`w-full compact-btn py-2 text-left ${entry ? 'border-primary bg-primary/10' : ''}`}>
+                  <button
+                    type="button"
+                    data-selected={!!entry}
+                    aria-pressed={!!entry}
+                    onClick={() => toggleSurgery('urologic', name)}
+                    className="w-full compact-btn py-2 text-left"
+                  >
                     <span className="text-[11px] font-medium text-foreground">{name}</span>
                   </button>
                   {entry && (
@@ -263,8 +299,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               const entry = profile.pastSurgicalHistory.general.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
-                  <button onClick={() => toggleSurgery('general', name)}
-                    className={`w-full compact-btn py-2 text-left ${entry ? 'border-primary bg-primary/10' : ''}`}>
+                  <button
+                    type="button"
+                    data-selected={!!entry}
+                    aria-pressed={!!entry}
+                    onClick={() => toggleSurgery('general', name)}
+                    className="w-full compact-btn py-2 text-left"
+                  >
                     <span className="text-[11px] font-medium text-foreground">{name}</span>
                   </button>
                   {entry && (
@@ -322,8 +363,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
                   placeholder={t.profile.specify} />
               </div>
               <div className="flex items-end">
-                <button onClick={() => setProfile(p => ({ ...p, medications: { ...p.medications, diuretics: !p.medications.diuretics } }))}
-                  className={`w-full compact-btn py-2.5 ${profile.medications.diuretics ? 'border-primary bg-primary/10' : ''}`}>
+                <button
+                  type="button"
+                  data-selected={profile.medications.diuretics}
+                  aria-pressed={profile.medications.diuretics}
+                  onClick={() => setProfile(p => ({ ...p, medications: { ...p.medications, diuretics: !p.medications.diuretics } }))}
+                  className="w-full compact-btn py-2.5"
+                >
                   <span className="text-[11px] font-medium text-foreground">{t.profile.diuretics}</span>
                 </button>
               </div>
@@ -349,8 +395,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
         {section === 6 && (
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.allergies}</h2>
-            <button onClick={() => setProfile(p => ({ ...p, allergies: { ...p.allergies, noKnownAllergies: !p.allergies.noKnownAllergies, entries: !p.allergies.noKnownAllergies ? [] : p.allergies.entries } }))}
-              className={`w-full compact-btn py-2.5 ${profile.allergies.noKnownAllergies ? 'border-primary bg-primary/10' : ''}`}>
+            <button
+              type="button"
+              data-selected={profile.allergies.noKnownAllergies}
+              aria-pressed={profile.allergies.noKnownAllergies}
+              onClick={() => setProfile(p => ({ ...p, allergies: { ...p.allergies, noKnownAllergies: !p.allergies.noKnownAllergies, entries: !p.allergies.noKnownAllergies ? [] : p.allergies.entries } }))}
+              className="w-full compact-btn py-2.5"
+            >
               <span className="text-sm font-medium text-foreground">{t.profile.nkda}</span>
             </button>
             {!profile.allergies.noKnownAllergies && (
