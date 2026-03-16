@@ -1,12 +1,11 @@
-import { Home, Calendar, FileText, Plus } from 'lucide-react';
+import { FileText, Plus, ClipboardList } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import type { TabType } from '@/types';
 
-const navItems: { id: TabType; icon: typeof Home; label: string }[] = [
-  { id: 'home', icon: Home, label: 'Home' },
-  { id: 'diary', icon: Calendar, label: 'Diary' },
+const navItems: { id: TabType; icon: typeof FileText; label: string }[] = [
+  { id: 'forms', icon: FileText, label: 'Questionnaires' },
   { id: 'record', icon: Plus, label: 'Record' },
-  { id: 'forms', icon: FileText, label: 'Forms' },
+  { id: 'summary', icon: ClipboardList, label: 'Summary' },
 ];
 
 export function BottomNav() {

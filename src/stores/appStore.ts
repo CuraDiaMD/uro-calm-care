@@ -16,6 +16,51 @@ import type {
   DailySymptomCheck,
 } from '@/types';
 
+export const EMPTY_PROFILE: PatientProfile = {
+  firstName: '',
+  lastName: '',
+  dateOfBirth: null,
+  sexAtBirth: null,
+  ramqNumber: '',
+  ramqExpiry: '',
+  cellPhone: '',
+  email: '',
+  familyPhysician: '',
+  chiefComplaints: [],
+  pastMedicalHistory: {
+    endocrine: [],
+    cardiovascular: [],
+    neurological: [],
+    kidneyUrologic: [],
+    cancer: [],
+    cancerOther: '',
+    other: [],
+  },
+  pastSurgicalHistory: {
+    urologic: [],
+    general: [],
+  },
+  familyHistory: {
+    conditions: [],
+    other: '',
+  },
+  medications: {
+    diabetesMeds: [],
+    diabetesMedsOther: '',
+    bloodThinners: [],
+    bpMeds: '',
+    diuretics: false,
+    urologicMeds: [],
+    otherPrescriptions: '',
+    supplements: [],
+    supplementsOther: '',
+  },
+  allergies: {
+    noKnownAllergies: false,
+    entries: [],
+  },
+};
+
 interface AppState {
   // Navigation
   activeTab: TabType;
@@ -102,7 +147,7 @@ const getLeakageVolume = (size: 'drops' | 'small' | 'large') => {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      activeTab: 'home',
+      activeTab: 'diary',
       setActiveTab: (tab) => set({ activeTab: tab }),
       
       // Intake flow
@@ -135,7 +180,7 @@ export const useAppStore = create<AppState>()(
         dailySymptomChecks: [...state.dailySymptomChecks, check]
       })),
       
-      // Data — start empty (no mock data in intake flow)
+      // Data
       intakeEntries: [],
       voidingEntries: [],
       leakageEntries: [],
