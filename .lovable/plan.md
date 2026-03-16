@@ -1,47 +1,29 @@
 
-Goal: complete the previously approved UI update by finishing the parts that are still missing or inconsistent.
 
-What I found
-- The small orange “+” shortcut buttons were added correctly in `DailySummaryCard.tsx`.
-- Wake/sleep were restored to their own separate row in `DailySummaryCard.tsx`.
-- `DiaryStatusCard.tsx` now has the intended 2/3 progress + 1/3 date-picker layout with a localized calendar popover.
-- The shared `selectedDiaryDate` store state is in place and wired up.
+## Fix: Voiding Summary Not Updating
 
-What is still incomplete
-- `CalendarScreen.tsx` still keeps its own large diary-progress card at the top, so the new compact progress/date pattern is not reflected there.
-- `CalendarScreen.tsx` still shows the selected date again above the entries list, which duplicates the new date selector instead of relying on it as the primary control.
-- The diary screen summary cards do not yet include the small quick-add “+” shortcuts, so the shortcut behavior is only finished on Home.
-- The diary screen still uses a slightly different summary-card layout/style than the updated Home pattern.
+### Root Cause
+In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
 
-Plan to finish it
-1. Align the diary screen header
-- Remove the large standalone progress block from `CalendarScreen.tsx`.
-- Reuse the compact top-row pattern already implemented in `DiaryStatusCard.tsx`, or embed `DiaryStatusCard` at the top of the diary screen if that fits existing structure cleanly.
-- Keep the date picker in that compact header as the single source of date selection UI.
+### Solution
+Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
 
-2. Remove duplicate date display in the diary screen
-- Delete the extra formatted date text above the entries list in `CalendarScreen.tsx`.
-- Let the top-right date selector be the only visible date control.
+### File Change: `src/components/home/DailySummaryCard.tsx`
 
-3. Add quick-add shortcuts to diary summary cards
-- Add the same small orange lower-right “+” button to the intake summary card in `CalendarScreen.tsx`.
-- Add the same small orange lower-right “+” button to the voiding summary card in `CalendarScreen.tsx`.
-- Wire them to `openRecordWithTab('intake')` and `openRecordWithTab('voiding')`.
+Replace the current selectors (lines 5-7):
+```typescript
+const getTodaySummary = useAppStore((state) => state.getTodaySummary);
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = getTodaySummary();
+```
 
-4. Keep leakage behavior consistent
-- Preserve the red alert badge in the upper-right of the voiding card on the diary screen.
-- Keep leakage rows in the entries list exactly as they are now.
+With:
+```typescript
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = useAppStore((state) => state.getTodaySummary());
+```
 
-5. Polish consistency
-- Match spacing, card heights, and icon/button sizing between Home and Diary so both views feel like the same design system.
-- Keep date formatting as `dd MMMM yyyy` with the current language locale.
+By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
 
-Files to update
-- `src/screens/CalendarScreen.tsx`
-- Possibly `src/components/home/DiaryStatusCard.tsx` only if small reuse adjustments are needed
+This is a one-line fix -- no other files need to change.
 
-Expected result
-- Both Home and Diary use the same compact progress/date header pattern.
-- The diary screen no longer duplicates the selected date.
-- Intake and voiding quick-add shortcuts work from both Home and Diary.
-- Leakage remains clearly signaled and all entries stay visible in the recorded list.
