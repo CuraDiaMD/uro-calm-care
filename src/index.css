@@ -1,0 +1,307 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* CuraDia Uro-OS Design System */
+@layer base {
+  :root {
+    /* Brand Colors */
+    --primary: 27 94% 54%;           /* Orange #F7931E */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 221 100% 36%;       /* Clinical Blue #0038B8 */
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 45 100% 64%;           /* Yellow #FFD24A */
+    --accent-foreground: 0 0% 10%;
+    
+    /* Backgrounds */
+    --background: 220 30% 96%;        /* Soft blue-grey */
+    --foreground: 0 0% 11%;           /* #1B1B1B */
+    
+    --muted: 220 25% 94%;             /* Soft Grey with blue tint */
+    --muted-foreground: 220 5% 40%;   /* #5F6368 */
+    
+    /* Glass Cards */
+    --card: 0 0% 100% / 0.7;          /* Translucent white */
+    --card-foreground: 0 0% 11%;
+    
+    --popover: 0 0% 100% / 0.85;
+    --popover-foreground: 0 0% 11%;
+    
+    /* Glass effect variables */
+    --glass-bg: hsl(0 0% 100% / 0.65);
+    --glass-border: hsl(0 0% 100% / 0.5);
+    --glass-blur: 16px;
+    
+    /* Semantic Colors */
+    --success: 125 42% 33%;          /* #2E7D32 */
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 35 90% 49%;           /* #ED8B00 */
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 68% 47%;        /* #C62828 */
+    --destructive-foreground: 0 0% 100%;
+    
+    /* UI Elements */
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 27 94% 54%;
+    
+    --radius: 0.75rem;
+    
+    /* Navigation */
+    --nav-height: 4rem;
+    --header-height: 3.5rem;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-card: 0 2px 8px -2px hsl(0 0% 0% / 0.08), 0 4px 16px -4px hsl(0 0% 0% / 0.06);
+    --shadow-fab: 0 4px 12px -2px hsl(27 94% 54% / 0.4);
+    
+    /* Sidebar - keeping defaults for shadcn */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 210 20% 98%;
+    
+    --card: 220 20% 13%;
+    --card-foreground: 210 20% 98%;
+    
+    --popover: 220 20% 13%;
+    --popover-foreground: 210 20% 98%;
+    
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 10% 60%;
+    
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 27 94% 54%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply text-foreground;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: linear-gradient(135deg, hsl(27 94% 54% / 0.08) 0%, hsl(220 30% 96%) 40%, hsl(221 100% 36% / 0.06) 100%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  /* Mobile-first container - single screen fit */
+  .app-container {
+    @apply mx-auto max-w-md flex flex-col;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: transparent;
+  }
+  
+  /* Main content area fills space between header and nav */
+  .main-content {
+    @apply flex-1 flex flex-col overflow-hidden;
+    min-height: 0;
+  }
+  
+  /* Screen container - fills available height */
+  .screen-container {
+    @apply flex-1 flex flex-col overflow-hidden p-4;
+    min-height: 0;
+  }
+  
+  /* Scrollable area within screen */
+  .scroll-area {
+    @apply flex-1 overflow-y-auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Glass card base */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+  
+  /* Summary cards - glassmorphism */
+  .summary-card {
+    @apply rounded-2xl p-4;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.08), 
+                0 2px 8px -2px hsl(0 0% 0% / 0.04),
+                inset 0 1px 1px hsl(0 0% 100% / 0.4);
+  }
+  
+  /* Quick log button - glass effect */
+  .quick-log-btn {
+    @apply flex flex-col items-center justify-center gap-2 p-4 rounded-xl 
+           transition-all duration-200 active:scale-95;
+    background: hsl(0 0% 100% / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid hsl(0 0% 100% / 0.6);
+    box-shadow: 0 2px 8px -2px hsl(0 0% 0% / 0.05);
+  }
+  
+  .quick-log-btn:hover {
+    background: hsl(0 0% 100% / 0.7);
+    border-color: hsl(27 94% 54% / 0.3);
+    box-shadow: 0 4px 16px -4px hsl(27 94% 54% / 0.15);
+  }
+  
+  /* FAB */
+  .fab {
+    @apply w-14 h-14 rounded-full bg-primary text-primary-foreground
+           flex items-center justify-center
+           shadow-[var(--shadow-fab)] transition-all duration-200
+           active:scale-95 hover:brightness-110;
+  }
+  
+  /* Bottom nav item */
+  .nav-item {
+    @apply flex flex-col items-center justify-center gap-1 flex-1 py-2
+           text-muted-foreground transition-colors duration-200;
+  }
+  
+  .nav-item.active {
+    @apply text-primary;
+  }
+  
+  /* IPSS option button - glass */
+  .ipss-option {
+    @apply w-full p-4 text-left rounded-xl transition-all duration-200
+           hover:border-primary/50 active:scale-[0.98];
+    background: hsl(0 0% 100% / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid hsl(0 0% 100% / 0.6);
+  }
+  
+  .ipss-option.selected {
+    @apply border-primary;
+    background: hsl(27 94% 54% / 0.1);
+  }
+  
+  /* Volume preset button - glass */
+  .volume-btn {
+    @apply flex flex-col items-center justify-center gap-1 p-4 rounded-xl
+           transition-all duration-200 active:scale-95;
+    background: hsl(0 0% 100% / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid hsl(0 0% 100% / 0.6);
+  }
+  
+  .volume-btn:hover {
+    border-color: hsl(27 94% 54% / 0.5);
+  }
+  
+  .volume-btn.selected {
+    @apply border-primary;
+    background: hsl(27 94% 54% / 0.15);
+  }
+  
+  /* Tab button */
+  .tab-btn {
+    @apply flex-1 py-3 px-4 text-sm font-medium text-muted-foreground
+           border-b-2 border-transparent transition-all duration-200;
+  }
+  
+  .tab-btn.active {
+    @apply text-primary border-primary;
+  }
+  
+  /* Chat bubble - glass */
+  .chat-bubble {
+    @apply max-w-[85%] p-3 rounded-2xl;
+  }
+  
+  .chat-bubble.user {
+    @apply bg-primary text-primary-foreground ml-auto rounded-br-md;
+  }
+  
+  .chat-bubble.assistant {
+    @apply mr-auto rounded-bl-md;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+}
+
+/* Safe area insets for PWA */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Compact styles for single-screen fit */
+.compact-card {
+  @apply rounded-xl p-3;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 12px -2px hsl(0 0% 0% / 0.06);
+}
+
+.compact-btn {
+  @apply flex flex-col items-center justify-center gap-1 p-2 rounded-lg 
+         transition-all duration-200 active:scale-95;
+  background: hsl(0 0% 100% / 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid hsl(0 0% 100% / 0.6);
+}
+
+.compact-btn:hover {
+  background: hsl(0 0% 100% / 0.7);
+  border-color: hsl(27 94% 54% / 0.3);
+}
+
+/* Compact questionnaire option */
+.compact-option {
+  @apply w-full p-3 text-left rounded-lg transition-all duration-200
+         hover:border-primary/50 active:scale-[0.98];
+  background: hsl(0 0% 100% / 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid hsl(0 0% 100% / 0.6);
+}
+
+.compact-option.selected {
+  @apply border-primary;
+  background: hsl(27 94% 54% / 0.1);
+}
