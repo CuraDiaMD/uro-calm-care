@@ -266,6 +266,7 @@ export const useAppStore = create<AppState>()(
     {
       name: 'curadia-storage',
       partialize: (state) => ({
+        language: state.language,
         intakeStatus: state.intakeStatus,
         currentIntakeStep: state.currentIntakeStep,
         patientProfile: state.patientProfile,

@@ -1,15 +1,17 @@
 import { Home, Plus, ClipboardList } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
+import { useTranslation } from '@/i18n';
 import type { TabType } from '@/types';
-
-const navItems: { id: TabType; icon: typeof Home; label: string }[] = [
-  { id: 'diary', icon: Home, label: 'Home' },
-  { id: 'record', icon: Plus, label: 'Record' },
-  { id: 'summary', icon: ClipboardList, label: 'Summary' },
-];
 
 export function BottomNav() {
   const { activeTab, setActiveTab, setRecordOpen } = useAppStore();
+  const t = useTranslation();
+  
+  const navItems: { id: TabType; icon: typeof Home; label: string }[] = [
+    { id: 'diary', icon: Home, label: t.nav.home },
+    { id: 'record', icon: Plus, label: t.nav.record },
+    { id: 'summary', icon: ClipboardList, label: t.nav.summary },
+  ];
   
   const handleNavClick = (id: TabType) => {
     if (id === 'record') {
@@ -29,24 +31,16 @@ export function BottomNav() {
           
           if (isRecord) {
             return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className="fab -mt-5 w-12 h-12"
-                aria-label={item.label}
-              >
+              <button key={item.id} onClick={() => handleNavClick(item.id)}
+                className="fab -mt-5 w-12 h-12" aria-label={item.label}>
                 <Plus className="w-5 h-5" strokeWidth={2.5} />
               </button>
             );
           }
           
           return (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className={`nav-item ${isActive ? 'active' : ''}`}
-              aria-label={item.label}
-            >
+            <button key={item.id} onClick={() => handleNavClick(item.id)}
+              className={`nav-item ${isActive ? 'active' : ''}`} aria-label={item.label}>
               <Icon className="w-4 h-4" />
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
