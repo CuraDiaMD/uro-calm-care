@@ -39,6 +39,37 @@ export function ReviewAndApproveScreen() {
     }
   }
   
+  // Sub-view rendering
+  if (subView === 'edit-profile') {
+    return (
+      <div className="screen-container gap-3">
+        <button
+          onClick={() => setSubView('main')}
+          className="flex items-center gap-1.5 text-sm text-primary font-medium self-start"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Summary
+        </button>
+        <PatientProfileScreen isEditMode onEditComplete={() => setSubView('main')} />
+      </div>
+    );
+  }
+  
+  if (subView === 'edit-forms') {
+    return (
+      <div className="screen-container gap-3">
+        <button
+          onClick={() => setSubView('main')}
+          className="flex items-center gap-1.5 text-sm text-primary font-medium self-start"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Summary
+        </button>
+        <FormsScreen />
+      </div>
+    );
+  }
+
   return (
     <div className="screen-container gap-3 justify-between">
       <h1 className="text-lg font-bold text-foreground flex-shrink-0">
@@ -48,9 +79,16 @@ export function ReviewAndApproveScreen() {
       <div className="flex-1 overflow-y-auto space-y-3 min-h-0">
         {/* Profile Summary */}
         <div className="compact-card space-y-2">
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" />
-            <h3 className="text-sm font-semibold text-foreground">Patient Profile</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-foreground">Patient Profile</h3>
+            </div>
+            {!isIntakeFlow && (
+              <button onClick={() => setSubView('edit-profile')} className="p-1.5 rounded-lg hover:bg-muted active:scale-95 transition-all">
+                <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            )}
           </div>
           {patientProfile ? (
             <div className="text-xs text-muted-foreground space-y-1">
@@ -97,9 +135,16 @@ export function ReviewAndApproveScreen() {
         
         {/* Questionnaires */}
         <div className="compact-card space-y-2">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-secondary" />
-            <h3 className="text-sm font-semibold text-foreground">Questionnaires</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-secondary" />
+              <h3 className="text-sm font-semibold text-foreground">Questionnaires</h3>
+            </div>
+            {!isIntakeFlow && (
+              <button onClick={() => setSubView('edit-forms')} className="p-1.5 rounded-lg hover:bg-muted active:scale-95 transition-all">
+                <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            )}
           </div>
           <div className="text-xs text-muted-foreground space-y-1">
             {ipssResults.length > 0 && (
