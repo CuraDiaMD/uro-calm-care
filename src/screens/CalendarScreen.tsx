@@ -4,14 +4,6 @@ import { useTranslation } from '@/i18n';
 import { format, isSameDay } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 
-const formatDiaryDate = (date: Date) => {
-  const day = `${date.getDate()}`.padStart(2, '0');
-  const month = `${date.getMonth() + 1}`.padStart(2, '0');
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
-};
-
 export function CalendarScreen() {
   const intakeEntries = useAppStore((state) => state.intakeEntries);
   const voidingEntries = useAppStore((state) => state.voidingEntries);
@@ -25,15 +17,15 @@ export function CalendarScreen() {
   const getSummaryForDate = useAppStore((state) => state.getSummaryForDate);
   const language = useAppStore((state) => state.language);
   const t = useTranslation();
-  
+
   const daysCompleted = getDiaryDaysCompleted();
   const locale = language === 'fr' ? frLocale : undefined;
-  const dayIntakes = intakeEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
-  const dayVoidings = voidingEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
-  const dayLeakages = leakageEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
+  const dayIntakes = intakeEntries.filter((e) => isSameDay(new Date(e.timestamp), selectedDate));
+  const dayVoidings = voidingEntries.filter((e) => isSameDay(new Date(e.timestamp), selectedDate));
+  const dayLeakages = leakageEntries.filter((e) => isSameDay(new Date(e.timestamp), selectedDate));
   const summary = getSummaryForDate(selectedDate);
   const hasLeakage = summary.leakageCount > 0 || summary.totalLeakage > 0;
-  
+
   return (
     <div className="screen-container gap-4">
       {diaryStartDate && (
@@ -51,23 +43,27 @@ export function CalendarScreen() {
         </div>
       )}
 
-      <div className="compact-card grid grid-cols-3 gap-3 flex-shrink-0">
-        <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground">Date</label>
-          <p className="text-sm font-semibold text-foreground">{formatDiaryDate(new Date(selectedDate))}</p>
-        </div>
+      <div className="compact-card grid grid-cols-2 gap-3 flex-shrink-0">
         <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
           <label className="text-[10px] uppercase tracking-wide text-muted-foreground">{t.calendar.wake}</label>
-          <input type="time" value={wakeTime || '06:00'} onChange={(e) => setSleepWakeTimes(sleepTime || '22:00', e.target.value)}
-            className="w-full text-sm font-semibold text-foreground bg-transparent outline-none" />
+          <input
+            type="time"
+            value={wakeTime || '06:00'}
+            onChange={(e) => setSleepWakeTimes(sleepTime || '22:00', e.target.value)}
+            className="w-full text-sm font-semibold text-foreground bg-transparent outline-none"
+          />
         </div>
         <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
           <label className="text-[10px] uppercase tracking-wide text-muted-foreground">{t.calendar.sleep}</label>
-          <input type="time" value={sleepTime || '22:00'} onChange={(e) => setSleepWakeTimes(e.target.value, wakeTime || '06:00')}
-            className="w-full text-sm font-semibold text-foreground bg-transparent outline-none" />
+          <input
+            type="time"
+            value={sleepTime || '22:00'}
+            onChange={(e) => setSleepWakeTimes(e.target.value, wakeTime || '06:00')}
+            className="w-full text-sm font-semibold text-foreground bg-transparent outline-none"
+          />
         </div>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-2 flex-shrink-0">
         <div className="compact-card">
           <div className="flex items-center gap-1.5 mb-1">
@@ -94,9 +90,14 @@ export function CalendarScreen() {
           </div>
         </div>
       </div>
-      
+
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        <h3 className="text-base font-semibold text-foreground mb-2 flex-shrink-0">{t.calendar.entries}</h3>
+        <div className="flex items-center justify-between gap-3 mb-2 flex-shrink-0">
+          <h3 className="text-base font-semibold text-foreground">{t.calendar.entries}</h3>
+          <p className="text-xs text-muted-foreground capitalize">
+            {format(new Date(selectedDate), 'dd MMMM yyyy', { locale })}
+          </p>
+        </div>
         {dayIntakes.length === 0 && dayVoidings.length === 0 && dayLeakages.length === 0 ? (
           <div className="compact-card text-center py-4 flex-shrink-0">
             <p className="text-sm text-muted-foreground">{t.calendar.noEntries}</p>
@@ -109,9 +110,11 @@ export function CalendarScreen() {
               .slice(0, 10)
               .map((entry, idx) => (
                 <div key={idx} className="compact-card flex items-center gap-2 py-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    'type' in entry && !('padUsed' in entry) ? 'bg-secondary' : 'padUsed' in entry ? 'bg-destructive' : 'bg-primary'
-                  }`} />
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      'type' in entry && !('padUsed' in entry) ? 'bg-secondary' : 'padUsed' in entry ? 'bg-destructive' : 'bg-primary'
+                    }`}
+                  />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground">
                       {'type' in entry && !('padUsed' in entry) && `${(entry as any).type} ${t.calendar.intakeEntry}`}
