@@ -55,7 +55,7 @@ export function CalendarScreen() {
         <div className="flex items-center gap-2 flex-1">
           <Moon className="w-4 h-4 text-secondary" />
           <div className="flex-1">
-            <label className="text-[10px] text-muted-foreground">Sleep</label>
+            <label className="text-xs text-muted-foreground">Sleep</label>
             <input
               type="time"
               value={sleepTime || '22:00'}
