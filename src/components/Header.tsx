@@ -1,4 +1,4 @@
-import { Settings, ChevronLeft } from 'lucide-react';
+import { RotateCcw, ChevronLeft } from 'lucide-react';
 import logo from '@/assets/curadia-logo.png';
 import { useAppStore } from '@/stores/appStore';
 import type { IntakeStep } from '@/types';
