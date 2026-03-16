@@ -326,6 +326,49 @@ export function RecordModal() {
               </div>
             </div>
           )}
+          
+          {recordTab === 'symptoms' && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Symptoms Today</label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { key: 'dysuria', label: 'Painful urination' },
+                    { key: 'pain', label: 'Pelvic pain' },
+                    { key: 'hematuria', label: 'Blood in urine' },
+                    { key: 'fever', label: 'Fever' },
+                  ].map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setSymptoms(s => ({ ...s, [key]: !s[key as keyof typeof s] }))}
+                      className={`compact-btn py-3 text-left ${
+                        symptoms[key as keyof typeof symptoms] ? 'border-destructive bg-destructive/10' : ''
+                      }`}
+                    >
+                      <span className="text-xs font-medium text-foreground">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Pad use today</label>
+                <div className="flex gap-1.5">
+                  {(['none', '1-2', '3+'] as const).map((val) => (
+                    <button
+                      key={val}
+                      onClick={() => setSymptoms(s => ({ ...s, padUse: val }))}
+                      className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all ${
+                        symptoms.padUse === val ? 'border-primary bg-primary/10 text-primary' : 'border-border'
+                      }`}
+                    >
+                      {val}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Save Button */}
