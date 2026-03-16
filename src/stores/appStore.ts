@@ -91,10 +91,12 @@ interface AppState {
   
   // Diary
   diaryStartDate: Date | null;
+  selectedDiaryDate: Date;
   sleepTime: string | null;
   wakeTime: string | null;
   dailySymptomChecks: DailySymptomCheck[];
   setDiaryStartDate: (date: Date) => void;
+  setSelectedDiaryDate: (date: Date) => void;
   setSleepWakeTimes: (sleep: string, wake: string) => void;
   addDailySymptomCheck: (check: DailySymptomCheck) => void;
   
@@ -115,6 +117,14 @@ interface AppState {
   addICIQUIResult: (result: Omit<ICIQUIResult, 'completedAt'>) => void;
   
   // Computed
+  getSummaryForDate: (date: Date) => {
+    totalIntake: number;
+    totalVoided: number;
+    daytimeFrequency: number;
+    nighttimeFrequency: number;
+    leakageCount: number;
+    totalLeakage: number;
+  };
   getTodaySummary: () => {
     totalIntake: number;
     totalVoided: number;
@@ -133,6 +143,12 @@ const isToday = (date: Date) => {
   const today = new Date();
   const d = new Date(date);
   return d.toDateString() === today.toDateString();
+};
+
+const isSameDay = (left: Date, right: Date) => {
+  const a = new Date(left);
+  const b = new Date(right);
+  return a.toDateString() === b.toDateString();
 };
 
 const isDaytime = (date: Date) => {
@@ -178,10 +194,12 @@ export const useAppStore = create<AppState>()(
       
       // Diary
       diaryStartDate: null,
+      selectedDiaryDate: new Date(),
       sleepTime: '22:00',
       wakeTime: '06:00',
       dailySymptomChecks: [],
       setDiaryStartDate: (date) => set({ diaryStartDate: date }),
+      setSelectedDiaryDate: (date) => set({ selectedDiaryDate: date }),
       setSleepWakeTimes: (sleep, wake) => set({ sleepTime: sleep, wakeTime: wake }),
       addDailySymptomCheck: (check) => set((state) => ({
         dailySymptomChecks: [...state.dailySymptomChecks, check]
@@ -237,21 +255,24 @@ export const useAppStore = create<AppState>()(
         ]
       })),
       
-      getTodaySummary: () => {
+      getSummaryForDate: (date) => {
         const state = get();
-        const todayIntakes = state.intakeEntries.filter(e => isToday(e.timestamp));
-        const todayVoidings = state.voidingEntries.filter(e => isToday(e.timestamp));
-        const todayLeakages = state.leakageEntries.filter(e => isToday(e.timestamp));
+        const targetDate = new Date(date);
+        const dateIntakes = state.intakeEntries.filter(e => isSameDay(new Date(e.timestamp), targetDate));
+        const dateVoidings = state.voidingEntries.filter(e => isSameDay(new Date(e.timestamp), targetDate));
+        const dateLeakages = state.leakageEntries.filter(e => isSameDay(new Date(e.timestamp), targetDate));
         
         return {
-          totalIntake: todayIntakes.reduce((sum, e) => sum + e.volume, 0),
-          totalVoided: todayVoidings.reduce((sum, e) => sum + e.volume, 0),
-          daytimeFrequency: todayVoidings.filter(e => isDaytime(e.timestamp)).length,
-          nighttimeFrequency: todayVoidings.filter(e => !isDaytime(e.timestamp)).length,
-          leakageCount: todayLeakages.length + todayVoidings.filter(e => e.hasLeak).length,
-          totalLeakage: todayLeakages.reduce((sum, e) => sum + getLeakageVolume(e.size), 0),
+          totalIntake: dateIntakes.reduce((sum, e) => sum + e.volume, 0),
+          totalVoided: dateVoidings.reduce((sum, e) => sum + e.volume, 0),
+          daytimeFrequency: dateVoidings.filter(e => isDaytime(e.timestamp)).length,
+          nighttimeFrequency: dateVoidings.filter(e => !isDaytime(e.timestamp)).length,
+          leakageCount: dateLeakages.length + dateVoidings.filter(e => e.hasLeak).length,
+          totalLeakage: dateLeakages.reduce((sum, e) => sum + getLeakageVolume(e.size), 0),
         };
       },
+      
+      getTodaySummary: () => get().getSummaryForDate(new Date()),
       
       getDiaryDaysCompleted: () => {
         const state = get();
@@ -278,6 +299,7 @@ export const useAppStore = create<AppState>()(
         oabqResults: state.oabqResults,
         iciqUiResults: state.iciqUiResults,
         diaryStartDate: state.diaryStartDate,
+        selectedDiaryDate: state.selectedDiaryDate,
         sleepTime: state.sleepTime,
         wakeTime: state.wakeTime,
         dailySymptomChecks: state.dailySymptomChecks,
