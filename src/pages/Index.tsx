@@ -59,8 +59,6 @@ const Index = () => {
   // Completed — diary is main view, tabs for questionnaires & summary
   const renderScreen = () => {
     switch (activeTab) {
-      case 'forms':
-        return <FormsScreen />;
       case 'summary':
         return <ReviewAndApproveScreen />;
       case 'diary':

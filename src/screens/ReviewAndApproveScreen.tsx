@@ -1,8 +1,14 @@
-import { CheckCircle, User, FileText, ClipboardList } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle, User, FileText, ClipboardList, Pencil, ArrowLeft } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { toast } from 'sonner';
+import { PatientProfileScreen } from './PatientProfileScreen';
+import { FormsScreen } from './FormsScreen';
+
+type SubView = 'main' | 'edit-profile' | 'edit-forms';
 
 export function ReviewAndApproveScreen() {
+  const [subView, setSubView] = useState<SubView>('main');
   const patientProfile = useAppStore((state) => state.patientProfile);
   const consents = useAppStore((state) => state.consents);
   const ipssResults = useAppStore((state) => state.ipssResults);
