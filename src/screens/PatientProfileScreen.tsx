@@ -181,12 +181,22 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.sexAtBirth} *</label>
               <div className="grid grid-cols-3 gap-2">
-                {(['male', 'female', 'other'] as SexAtBirth[]).map((sex) => (
-                  <button key={sex} onClick={() => updateField('sexAtBirth', sex)}
-                    className={`compact-btn py-2.5 ${profile.sexAtBirth === sex ? 'border-primary bg-primary/10' : ''}`}>
-                    <span className="text-sm font-medium">{sexLabels[sex]}</span>
-                  </button>
-                ))}
+                {(['male', 'female', 'other'] as SexAtBirth[]).map((sex) => {
+                  const isSelected = profile.sexAtBirth === sex;
+
+                  return (
+                    <button
+                      key={sex}
+                      type="button"
+                      data-selected={isSelected}
+                      aria-pressed={isSelected}
+                      onClick={() => updateField('sexAtBirth', sex)}
+                      className="compact-btn py-2.5"
+                    >
+                      <span className="text-sm font-medium">{sexLabels[sex]}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div>
