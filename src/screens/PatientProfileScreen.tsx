@@ -242,7 +242,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.surgicalHistory}</h2>
             <SectionLabel>{t.profile.urologicSurgeries}</SectionLabel>
-            {SURG_UROLOGIC.map(name => {
+            {profileOptions.surgery.urologic.map(name => {
               const entry = profile.pastSurgicalHistory.urologic.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
@@ -259,7 +259,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               );
             })}
             <SectionLabel>{t.profile.generalSurgeries}</SectionLabel>
-            {SURG_GENERAL.map(name => {
+            {profileOptions.surgery.general.map(name => {
               const entry = profile.pastSurgicalHistory.general.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
@@ -272,7 +272,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
                       <input value={entry.year || ''} onChange={(e) => updateSurgeryYear('general', name, e.target.value)}
                         className="flex-1 p-2 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary"
                         placeholder={t.profile.yearOptional} />
-                      {name === 'Hernia Repair' && (
+                      {name === profileOptions.surgery.general[0] && (
                         <button onClick={() => toggleSurgeryMesh('general', name)}
                           className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${entry.meshUsed ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>
                           {t.profile.mesh}
