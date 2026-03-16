@@ -227,12 +227,22 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             <h2 className="text-lg font-semibold text-foreground">{t.profile.chiefComplaints}</h2>
             <p className="text-xs text-muted-foreground">{t.profile.selectAllApply}</p>
             <div className="grid grid-cols-2 gap-2">
-              {(Object.keys(t.chiefComplaints) as ChiefComplaint[]).map((key) => (
-                <button key={key} onClick={() => toggleComplaint(key)}
-                  className={`compact-btn py-2.5 text-left ${profile.chiefComplaints.includes(key) ? 'border-primary bg-primary/10' : ''}`}>
-                  <span className="text-xs font-medium text-foreground">{t.chiefComplaints[key]}</span>
-                </button>
-              ))}
+              {(Object.keys(t.chiefComplaints) as ChiefComplaint[]).map((key) => {
+                const isSelected = profile.chiefComplaints.includes(key);
+
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    data-selected={isSelected}
+                    aria-pressed={isSelected}
+                    onClick={() => toggleComplaint(key)}
+                    className="compact-btn py-2.5 text-left"
+                  >
+                    <span className="text-xs font-medium text-foreground">{t.chiefComplaints[key]}</span>
+                  </button>
+                );
+              })}
             </div>
           </>
         )}
