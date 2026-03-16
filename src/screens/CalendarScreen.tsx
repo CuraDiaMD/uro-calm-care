@@ -157,58 +157,6 @@ export function CalendarScreen() {
         </div>
       )}
       
-      {/* Daily Symptom Check */}
-      <div className="compact-card flex-shrink-0 space-y-2">
-        <h3 className="text-sm font-semibold text-foreground">Daily Symptom Check</h3>
-        <div className="grid grid-cols-2 gap-1.5">
-          {[
-            { key: 'dysuria', label: 'Painful urination' },
-            { key: 'pain', label: 'Pelvic pain' },
-            { key: 'hematuria', label: 'Blood in urine' },
-            { key: 'fever', label: 'Fever' },
-          ].map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setSymptoms(s => ({ ...s, [key]: !s[key as keyof typeof s] }))}
-              className={`compact-btn py-2 text-left ${
-                symptoms[key as keyof typeof symptoms] ? 'border-destructive bg-destructive/10' : ''
-              }`}
-            >
-              <span className="text-[11px] font-medium text-foreground">{label}</span>
-            </button>
-          ))}
-        </div>
-        
-        <div>
-          <label className="text-[11px] font-medium text-foreground mb-1 block">Pad use today</label>
-          <div className="flex gap-1.5">
-            {(['none', '1-2', '3+'] as const).map((val) => (
-              <button
-                key={val}
-                onClick={() => setSymptoms(s => ({ ...s, padUse: val }))}
-                className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                  symptoms.padUse === val ? 'border-primary bg-primary/10 text-primary' : 'border-border'
-                }`}
-              >
-                {val}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {!todayCheck && (
-          <button
-            onClick={handleSaveSymptoms}
-            className="w-full py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold"
-          >
-            Save Symptom Check
-          </button>
-        )}
-        {todayCheck && (
-          <p className="text-[10px] text-success font-medium">✅ Symptoms logged for this day</p>
-        )}
-      </div>
-      
       {/* Recent Entries */}
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <h3 className="text-sm font-semibold text-foreground mb-2 flex-shrink-0">Entries</h3>
