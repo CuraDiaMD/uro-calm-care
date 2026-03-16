@@ -124,6 +124,28 @@ export const fr: TranslationSchema = {
     complaintsError: 'Veuillez sélectionner au moins une plainte principale',
   },
 
+  profileOptions: {
+    pmh: {
+      endocrine: ['Diabète de type 1', 'Diabète de type 2'],
+      cardiovascular: ['Hypertension artérielle', 'Coronaropathie', 'Insuffisance cardiaque', 'Fibrillation auriculaire'],
+      neurological: ['AVC / AIT', 'Maladie de Parkinson', 'Sclérose en plaques', 'Lésion médullaire', 'Maladie d’Alzheimer / démence'],
+      kidneyUrologic: ['Lithiase rénale', 'Maladie rénale chronique', 'Infections urinaires récidivantes', 'Hyperplasie bénigne de la prostate'],
+      cancer: ['Cancer de la prostate', 'Cancer de la vessie', 'Cancer du rein', 'Cancer du testicule', 'Radiothérapie / chimiothérapie pelvienne'],
+      other: ['Asthme / MPOC / apnée du sommeil', 'Trouble de la coagulation', 'Maladie de Crohn / rectocolite hémorragique'],
+    },
+    surgery: {
+      urologic: ['Chirurgie de la prostate', 'Chirurgie rénale', 'Chirurgie vésicale', 'Vasectomie', 'Hystérectomie / césarienne', 'Réparation du plancher pelvien'],
+      general: ['Cure de hernie', 'Chirurgie intestinale', 'Chirurgie bariatrique'],
+    },
+    familyHistory: ['Cancer de la prostate', 'Cancer de la vessie', 'Cancer du rein', 'Lithiase rénale'],
+    medications: {
+      diabetes: ['Insuline', 'Metformine', 'Inhibiteurs du SGLT2', 'Agonistes des récepteurs du GLP-1'],
+      bloodThinners: ['Aspirine', 'Clopidogrel (Plavix)', 'Warfarine (Coumadin)', 'Apixaban / Rivaroxaban'],
+      urologic: ['Tamsulosine (Flomax)', 'Finastéride', 'Dutastéride', 'Oxybutynine', 'Mirabégron', 'Toltérodine'],
+      supplements: ['Palmier nain', 'Vitamine C / calcium'],
+    },
+  },
+
   // Chief Complaint Labels
   chiefComplaints: {
     frequency: 'Fréquence urinaire',

@@ -24,6 +24,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
   const t = useTranslation();
   
   const SECTIONS = [t.profile.demographics, t.profile.complaints, t.profile.medicalHx, t.profile.surgicalHx, t.profile.familyHx, t.profile.medications, t.profile.allergies];
+  const profileOptions = t.profileOptions;
   
   const [profile, setProfile] = useState<PatientProfile>(existingProfile || EMPTY_PROFILE);
   const [section, setSection] = useState(0);
