@@ -1,7 +1,9 @@
-import { useState, type ReactNode } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import curадiaLogo from "@/assets/curadia-logo.png";
+import curadiaLogo from "@/assets/curadia-logo.png";
+import { useAppStore } from "@/stores/appStore";
+import { useTranslation } from "@/i18n";
 
 const DEMO_PASSWORD = "DIA-84842486";
 const SESSION_KEY = "curadia-demo-access";
@@ -16,10 +18,13 @@ const PasswordGate = ({ children }: PasswordGateProps) => {
   );
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const language = useAppStore((state) => state.language);
+  const setLanguage = useAppStore((state) => state.setLanguage);
+  const t = useTranslation();
 
   if (granted) return <>{children}</>;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (password === DEMO_PASSWORD) {
       sessionStorage.setItem(SESSION_KEY, "true");
@@ -40,15 +45,28 @@ const PasswordGate = ({ children }: PasswordGateProps) => {
       />
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 flex flex-col items-center gap-6 w-full max-w-xs px-6"
+        className="relative z-10 flex w-full max-w-xs flex-col items-center gap-6 px-6"
       >
-        <img src={curадiaLogo} alt="CuraDia" className="h-36 mb-2" />
-        <p className="text-sm text-muted-foreground text-center">
-          Enter the demo password to continue
+        <div className="flex w-full justify-end">
+          <button
+            type="button"
+            aria-label={t.passwordGate.languageToggle}
+            onClick={() => setLanguage(language === "en" ? "fr" : "en")}
+            className="flex items-center gap-0.5 rounded-lg border border-border px-2 py-1 text-xs font-semibold transition-colors hover:bg-muted"
+          >
+            <span className={language === "en" ? "text-primary" : "text-muted-foreground"}>EN</span>
+            <span className="text-muted-foreground">|</span>
+            <span className={language === "fr" ? "text-primary" : "text-muted-foreground"}>FR</span>
+          </button>
+        </div>
+
+        <img src={curadiaLogo} alt="CuraDia" className="mb-2 h-36" />
+        <p className="text-center text-sm text-muted-foreground">
+          {t.passwordGate.prompt}
         </p>
         <Input
           type="password"
-          placeholder="Password"
+          placeholder={t.passwordGate.placeholder}
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -58,10 +76,10 @@ const PasswordGate = ({ children }: PasswordGateProps) => {
           autoFocus
         />
         {error && (
-          <p className="text-sm text-destructive -mt-4">Incorrect password</p>
+          <p className="-mt-4 text-sm text-destructive">{t.passwordGate.incorrect}</p>
         )}
         <Button type="submit" className="w-full">
-          Continue
+          {t.passwordGate.continue}
         </Button>
       </form>
     </div>
