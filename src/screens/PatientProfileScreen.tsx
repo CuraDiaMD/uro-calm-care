@@ -220,21 +220,21 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.pastMedicalHistory}</h2>
             <SectionLabel>{t.profile.endocrine}</SectionLabel>
-            <CheckboxGrid items={PMH_ENDOCRINE} selected={profile.pastMedicalHistory.endocrine} onToggle={(item) => togglePMH('endocrine', item)} />
+            <CheckboxGrid items={profileOptions.pmh.endocrine} selected={profile.pastMedicalHistory.endocrine} onToggle={(item) => togglePMH('endocrine', item)} />
             <SectionLabel>{t.profile.cardiovascular}</SectionLabel>
-            <CheckboxGrid items={PMH_CARDIOVASCULAR} selected={profile.pastMedicalHistory.cardiovascular} onToggle={(item) => togglePMH('cardiovascular', item)} />
+            <CheckboxGrid items={profileOptions.pmh.cardiovascular} selected={profile.pastMedicalHistory.cardiovascular} onToggle={(item) => togglePMH('cardiovascular', item)} />
             <SectionLabel>{t.profile.neurological}</SectionLabel>
-            <CheckboxGrid items={PMH_NEUROLOGICAL} selected={profile.pastMedicalHistory.neurological} onToggle={(item) => togglePMH('neurological', item)} />
+            <CheckboxGrid items={profileOptions.pmh.neurological} selected={profile.pastMedicalHistory.neurological} onToggle={(item) => togglePMH('neurological', item)} />
             <SectionLabel>{t.profile.kidneyUrologic}</SectionLabel>
-            <CheckboxGrid items={PMH_KIDNEY_UROLOGIC} selected={profile.pastMedicalHistory.kidneyUrologic} onToggle={(item) => togglePMH('kidneyUrologic', item)} />
+            <CheckboxGrid items={profileOptions.pmh.kidneyUrologic} selected={profile.pastMedicalHistory.kidneyUrologic} onToggle={(item) => togglePMH('kidneyUrologic', item)} />
             <SectionLabel>{t.profile.cancerHistory}</SectionLabel>
-            <CheckboxGrid items={PMH_CANCER} selected={profile.pastMedicalHistory.cancer} onToggle={(item) => togglePMH('cancer', item)} />
+            <CheckboxGrid items={profileOptions.pmh.cancer} selected={profile.pastMedicalHistory.cancer} onToggle={(item) => togglePMH('cancer', item)} />
             <input value={profile.pastMedicalHistory.cancerOther}
               onChange={(e) => setProfile(p => ({ ...p, pastMedicalHistory: { ...p.pastMedicalHistory, cancerOther: e.target.value } }))}
               className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm mt-1.5"
               placeholder={t.profile.otherCancer} />
             <SectionLabel>{t.profile.otherPMH}</SectionLabel>
-            <CheckboxGrid items={PMH_OTHER} selected={profile.pastMedicalHistory.other} onToggle={(item) => togglePMH('other', item)} />
+            <CheckboxGrid items={profileOptions.pmh.other} selected={profile.pastMedicalHistory.other} onToggle={(item) => togglePMH('other', item)} />
           </>
         )}
 
