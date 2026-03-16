@@ -176,7 +176,7 @@ export function CalendarScreen() {
                     'type' in entry && !('padUsed' in entry) ? 'bg-secondary' : 'padUsed' in entry ? 'bg-destructive' : 'bg-primary'
                   }`} />
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-foreground">
+                    <p className="text-sm font-medium text-foreground">
                       {'type' in entry && !('padUsed' in entry) && `${(entry as any).type} intake`}
                       {'urgeScale' in entry && 'Voiding'}
                       {'padUsed' in entry && 'Leakage'}
