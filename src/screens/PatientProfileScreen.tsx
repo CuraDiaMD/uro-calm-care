@@ -25,7 +25,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 const SECTIONS = ['Demographics', 'Complaints', 'Medical Hx', 'Surgical Hx', 'Family Hx', 'Medications', 'Allergies'];
 
-export function PatientProfileScreen() {
+interface PatientProfileScreenProps {
+  isEditMode?: boolean;
+  onEditComplete?: () => void;
+}
+
+export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProfileScreenProps = {}) {
   const existingProfile = useAppStore((state) => state.patientProfile);
   const setPatientProfile = useAppStore((state) => state.setPatientProfile);
   const setCurrentIntakeStep = useAppStore((state) => state.setCurrentIntakeStep);
@@ -499,9 +504,17 @@ export function PatientProfileScreen() {
             Back
           </button>
         )}
-        <button onClick={handleContinue}
+        <button onClick={() => {
+            if (isEditMode && section === SECTIONS.length - 1) {
+              setPatientProfile(profile);
+              toast.success('Profile updated');
+              onEditComplete?.();
+            } else {
+              handleContinue();
+            }
+          }}
           className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform">
-          {section === SECTIONS.length - 1 ? 'Continue to Questionnaires' : 'Continue'}
+          {section === SECTIONS.length - 1 ? (isEditMode ? 'Save Changes' : 'Continue to Questionnaires') : 'Continue'}
         </button>
       </div>
     </div>

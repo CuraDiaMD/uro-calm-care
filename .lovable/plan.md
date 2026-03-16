@@ -1,34 +1,29 @@
 
 
-# Plan: Restore Home Screen & Restructure Navigation
+## Fix: Voiding Summary Not Updating
 
-## Changes
+### Root Cause
+In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
 
-### 1. Bottom Nav: Home | FAB+ | Summary
-Update `src/components/BottomNav.tsx`:
-- Change first tab from "Questionnaires" (`forms`) to "Home" (`diary`) with a Home icon
-- Keep FAB+ center button
-- Keep "Summary" right tab
+### Solution
+Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
 
-### 2. Home tab = old-style HomeScreen with DailySummaryCard + QuickIntakeSection
-Update `src/pages/Index.tsx`:
-- Default `diary` tab renders `CalendarScreen` (the diary with big intake/voiding summary cards, sleep/wake times, diary progress, entries list) — this is already the "home" view with the big sections the user liked
-- Remove the `forms` case from tab switching since it moves to Summary
+### File Change: `src/components/home/DailySummaryCard.tsx`
 
-### 3. Summary tab = Profile + Questionnaires + Diary data (editable)
-Update `src/screens/ReviewAndApproveScreen.tsx` (the Summary screen):
-- Add "Edit" buttons/links next to Patient Profile and Questionnaires sections
-- Profile edit: navigates to `PatientProfileScreen` in edit mode (add an `onComplete` callback to return to summary)
-- Questionnaires edit: navigates to `FormsScreen` inline (same pattern)
-- Keep the existing summary cards (profile, consents, questionnaires, diary data)
+Replace the current selectors (lines 5-7):
+```typescript
+const getTodaySummary = useAppStore((state) => state.getTodaySummary);
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = getTodaySummary();
+```
 
-### 4. Inline editing from Summary
-- Add state in `appStore` like `summarySubView: 'main' | 'edit-profile' | 'edit-forms'` to allow navigating to profile/forms editors from summary and returning back
-- Or simpler: render FormsScreen/PatientProfileScreen conditionally within the Summary tab based on local state
+With:
+```typescript
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = useAppStore((state) => state.getTodaySummary());
+```
 
-**Files to modify:**
-- `src/components/BottomNav.tsx` — rename first tab to Home
-- `src/pages/Index.tsx` — update tab routing
-- `src/screens/ReviewAndApproveScreen.tsx` — add edit buttons for profile & questionnaires, with inline sub-navigation
-- `src/types/index.ts` — update TabType if needed (keep `diary` as home, keep `summary`)
+By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
+
+This is a one-line fix -- no other files need to change.
 

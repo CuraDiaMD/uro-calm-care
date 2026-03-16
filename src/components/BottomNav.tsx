@@ -1,9 +1,9 @@
-import { FileText, Plus, ClipboardList } from 'lucide-react';
+import { Home, Plus, ClipboardList } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import type { TabType } from '@/types';
 
-const navItems: { id: TabType; icon: typeof FileText; label: string }[] = [
-  { id: 'forms', icon: FileText, label: 'Questionnaires' },
+const navItems: { id: TabType; icon: typeof Home; label: string }[] = [
+  { id: 'diary', icon: Home, label: 'Home' },
   { id: 'record', icon: Plus, label: 'Record' },
   { id: 'summary', icon: ClipboardList, label: 'Summary' },
 ];
