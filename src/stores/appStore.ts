@@ -145,6 +145,12 @@ const isToday = (date: Date) => {
   return d.toDateString() === today.toDateString();
 };
 
+const isSameDay = (left: Date, right: Date) => {
+  const a = new Date(left);
+  const b = new Date(right);
+  return a.toDateString() === b.toDateString();
+};
+
 const isDaytime = (date: Date) => {
   const hours = new Date(date).getHours();
   return hours >= 6 && hours < 22;
