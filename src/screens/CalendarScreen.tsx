@@ -1,18 +1,44 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Droplets, Activity, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Droplets, Activity, AlertCircle, Moon, Sun, Clock } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
+import type { DailySymptomCheck } from '@/types';
 
 export function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const intakeEntries = useAppStore((state) => state.intakeEntries);
   const voidingEntries = useAppStore((state) => state.voidingEntries);
   const leakageEntries = useAppStore((state) => state.leakageEntries);
+  const diaryStartDate = useAppStore((state) => state.diaryStartDate);
+  const sleepTime = useAppStore((state) => state.sleepTime);
+  const wakeTime = useAppStore((state) => state.wakeTime);
+  const setSleepWakeTimes = useAppStore((state) => state.setSleepWakeTimes);
+  const getDiaryDaysCompleted = useAppStore((state) => state.getDiaryDaysCompleted);
+  const dailySymptomChecks = useAppStore((state) => state.dailySymptomChecks);
+  const addDailySymptomCheck = useAppStore((state) => state.addDailySymptomCheck);
   
-  // Generate week dates
+  const daysCompleted = getDiaryDaysCompleted();
+  
+  // Symptom check state for today
+  const todayCheck = dailySymptomChecks.find(c => isSameDay(new Date(c.date), selectedDate));
+  const [symptoms, setSymptoms] = useState({
+    dysuria: todayCheck?.dysuria || false,
+    pain: todayCheck?.pain || false,
+    hematuria: todayCheck?.hematuria || false,
+    fever: todayCheck?.fever || false,
+    padUse: todayCheck?.padUse || 'none' as 'none' | '1-2' | '3+',
+  });
+  
+  const handleSaveSymptoms = () => {
+    const check: DailySymptomCheck = {
+      date: selectedDate,
+      ...symptoms,
+    };
+    addDailySymptomCheck(check);
+  };
+  
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(subDays(selectedDate, 3), i));
   
-  // Filter entries for selected date
   const dayIntakes = intakeEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
   const dayVoidings = voidingEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
   const dayLeakages = leakageEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
@@ -26,6 +52,54 @@ export function CalendarScreen() {
   
   return (
     <div className="screen-container gap-3">
+      {/* Diary Progress */}
+      {diaryStartDate && (
+        <div className="compact-card flex-shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-foreground">3-Day Diary Progress</h2>
+            <span className="text-xs font-medium text-primary">{Math.min(daysCompleted, 3)}/3 days</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div 
+              className="bg-primary h-2 rounded-full transition-all"
+              style={{ width: `${(Math.min(daysCompleted, 3) / 3) * 100}%` }}
+            />
+          </div>
+          {daysCompleted >= 3 && (
+            <p className="text-xs text-success mt-1.5 font-medium">✅ Diary complete! You can review and submit.</p>
+          )}
+        </div>
+      )}
+      
+      {/* Sleep/Wake Times */}
+      <div className="compact-card flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-1">
+          <Moon className="w-4 h-4 text-secondary" />
+          <div className="flex-1">
+            <label className="text-[10px] text-muted-foreground">Sleep</label>
+            <input
+              type="time"
+              value={sleepTime || '22:00'}
+              onChange={(e) => setSleepWakeTimes(e.target.value, wakeTime || '06:00')}
+              className="w-full text-sm font-medium text-foreground bg-transparent outline-none"
+            />
+          </div>
+        </div>
+        <div className="w-px h-8 bg-border" />
+        <div className="flex items-center gap-2 flex-1">
+          <Sun className="w-4 h-4 text-warning" />
+          <div className="flex-1">
+            <label className="text-[10px] text-muted-foreground">Wake</label>
+            <input
+              type="time"
+              value={wakeTime || '06:00'}
+              onChange={(e) => setSleepWakeTimes(sleepTime || '22:00', e.target.value)}
+              className="w-full text-sm font-medium text-foreground bg-transparent outline-none"
+            />
+          </div>
+        </div>
+      </div>
+      
       {/* Date Picker */}
       <div className="compact-card flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
@@ -63,9 +137,7 @@ export function CalendarScreen() {
                     : 'hover:bg-muted'
                 }`}
               >
-                <p className="text-[9px] uppercase font-medium opacity-70">
-                  {format(date, 'EEE')}
-                </p>
+                <p className="text-[9px] uppercase font-medium opacity-70">{format(date, 'EEE')}</p>
                 <p className="text-base font-semibold">{format(date, 'd')}</p>
               </button>
             );
@@ -106,9 +178,61 @@ export function CalendarScreen() {
         </div>
       )}
       
-      {/* Recent Entries - Scrollable */}
+      {/* Daily Symptom Check */}
+      <div className="compact-card flex-shrink-0 space-y-2">
+        <h3 className="text-sm font-semibold text-foreground">Daily Symptom Check</h3>
+        <div className="grid grid-cols-2 gap-1.5">
+          {[
+            { key: 'dysuria', label: 'Painful urination' },
+            { key: 'pain', label: 'Pelvic pain' },
+            { key: 'hematuria', label: 'Blood in urine' },
+            { key: 'fever', label: 'Fever' },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setSymptoms(s => ({ ...s, [key]: !s[key as keyof typeof s] }))}
+              className={`compact-btn py-2 text-left ${
+                symptoms[key as keyof typeof symptoms] ? 'border-destructive bg-destructive/10' : ''
+              }`}
+            >
+              <span className="text-[11px] font-medium text-foreground">{label}</span>
+            </button>
+          ))}
+        </div>
+        
+        <div>
+          <label className="text-[11px] font-medium text-foreground mb-1 block">Pad use today</label>
+          <div className="flex gap-1.5">
+            {(['none', '1-2', '3+'] as const).map((val) => (
+              <button
+                key={val}
+                onClick={() => setSymptoms(s => ({ ...s, padUse: val }))}
+                className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                  symptoms.padUse === val ? 'border-primary bg-primary/10 text-primary' : 'border-border'
+                }`}
+              >
+                {val}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {!todayCheck && (
+          <button
+            onClick={handleSaveSymptoms}
+            className="w-full py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold"
+          >
+            Save Symptom Check
+          </button>
+        )}
+        {todayCheck && (
+          <p className="text-[10px] text-success font-medium">✅ Symptoms logged for this day</p>
+        )}
+      </div>
+      
+      {/* Recent Entries */}
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        <h3 className="text-sm font-semibold text-foreground mb-2 flex-shrink-0">Today's Entries</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-2 flex-shrink-0">Entries</h3>
         {dayIntakes.length === 0 && dayVoidings.length === 0 && dayLeakages.length === 0 ? (
           <div className="compact-card text-center py-4 flex-shrink-0">
             <p className="text-sm text-muted-foreground">No entries for this day</p>
@@ -122,13 +246,13 @@ export function CalendarScreen() {
               .map((entry, idx) => (
                 <div key={idx} className="compact-card flex items-center gap-2 py-2">
                   <div className={`w-2 h-2 rounded-full ${
-                    'type' in entry ? 'bg-secondary' : 'size' in entry ? 'bg-destructive' : 'bg-primary'
+                    'type' in entry && !('padUsed' in entry) ? 'bg-secondary' : 'padUsed' in entry ? 'bg-destructive' : 'bg-primary'
                   }`} />
                   <div className="flex-1">
                     <p className="text-xs font-medium text-foreground">
-                      {'type' in entry && `${entry.type} intake`}
+                      {'type' in entry && !('padUsed' in entry) && `${(entry as any).type} intake`}
                       {'urgeScale' in entry && 'Voiding'}
-                      {'size' in entry && 'Leakage'}
+                      {'padUsed' in entry && 'Leakage'}
                     </p>
                     <p className="text-[10px] text-muted-foreground">
                       {format(new Date(entry.timestamp), 'h:mm a')}
@@ -136,7 +260,7 @@ export function CalendarScreen() {
                   </div>
                   <p className="text-xs font-semibold text-foreground">
                     {'volume' in entry && `${entry.volume} mL`}
-                    {'size' in entry && entry.size}
+                    {'size' in entry && !('volume' in entry) && (entry as any).size}
                   </p>
                 </div>
               ))}

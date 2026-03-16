@@ -1,12 +1,70 @@
 export type BeverageType = 'water' | 'caffeine' | 'soda' | 'juice' | 'alcohol' | 'other';
 
-export type VolumePreset = 'small' | 'medium' | 'large' | 'custom';
+export type VolumePreset = 'small' | 'medium' | 'large';
 
-export type LeakageSize = 'small' | 'medium' | 'large';
+export type LeakageSize = 'drops' | 'small' | 'large';
 
-export type TabType = 'home' | 'calendar' | 'record' | 'forms' | 'chat';
+export type LeakageType = 'stress' | 'urge' | 'mixed' | 'unknown';
+
+export type TabType = 'home' | 'diary' | 'record' | 'forms';
 
 export type RecordTab = 'intake' | 'voiding' | 'leakage';
+
+export type IntakeStatus = 'not-started' | 'in-progress' | 'completed';
+
+export type IntakeStep = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export type SexAtBirth = 'male' | 'female' | 'other';
+
+export type ChiefComplaint =
+  | 'frequency'
+  | 'urgency'
+  | 'nocturia'
+  | 'incontinence'
+  | 'weak-stream'
+  | 'hesitancy'
+  | 'hematuria'
+  | 'recurrent-uti'
+  | 'pelvic-pain'
+  | 'other';
+
+export interface PatientProfile {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date | null;
+  sexAtBirth: SexAtBirth | null;
+  ramqNumber: string;
+  ramqExpiry: string;
+  cellPhone: string;
+  email: string;
+  familyPhysician: string;
+  chiefComplaints: ChiefComplaint[];
+  pastMedicalHistory: string[];
+  pastSurgicalHistory: string;
+  familyHistory: string;
+  medications: string;
+  allergies: string;
+}
+
+export interface Consent {
+  clinicalData: boolean;
+  researchData: boolean;
+  communication: boolean;
+  timestamps: {
+    clinical?: Date;
+    research?: Date;
+    communication?: Date;
+  };
+}
+
+export interface DailySymptomCheck {
+  date: Date;
+  dysuria: boolean;
+  pain: boolean;
+  hematuria: boolean;
+  fever: boolean;
+  padUse: 'none' | '1-2' | '3+';
+}
 
 export interface IntakeEntry {
   id: string;
@@ -19,7 +77,7 @@ export interface IntakeEntry {
 export interface VoidingEntry {
   id: string;
   volume: number;
-  urgeScale: 1 | 2 | 3 | 4 | 5;
+  urgeScale: 0 | 1 | 2 | 3 | 4;
   isSleep: boolean;
   hasLeak: boolean;
   timestamp: Date;
@@ -29,6 +87,9 @@ export interface VoidingEntry {
 export interface LeakageEntry {
   id: string;
   size: LeakageSize;
+  activity: string;
+  type: LeakageType;
+  padUsed: boolean;
   timestamp: Date;
   memo?: string;
 }
@@ -68,18 +129,6 @@ export interface OABqResult {
   completedAt: Date;
 }
 
-export interface ICIQOABAnswer {
-  questionIndex: number;
-  score: number;
-  botherScore?: number;
-}
-
-export interface ICIQOABResult {
-  answers: ICIQOABAnswer[];
-  totalScore: number;
-  completedAt: Date;
-}
-
 export interface ICIQUIAnswer {
   questionIndex: number;
   score: number | string[];
@@ -92,14 +141,7 @@ export interface ICIQUIResult {
   completedAt: Date;
 }
 
-export type QuestionnaireType = 'ipss' | 'oabq' | 'iciq-oab' | 'iciq-ui';
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+export type QuestionnaireType = 'ipss' | 'oabq' | 'iciq-ui';
 
 export const VOLUME_PRESETS = {
   small: 240,
@@ -116,39 +158,23 @@ export const BEVERAGE_INFO: Record<BeverageType, { label: string; icon: string }
   other: { label: 'Other', icon: 'glass-water' },
 };
 
+export const URGE_SCALE_LABELS: Record<number, string> = {
+  0: 'No urgency',
+  1: 'Mild',
+  2: 'Moderate',
+  3: 'Severe',
+  4: 'Could not hold',
+};
+
 export const IPSS_QUESTIONS = [
-  {
-    question: "How often have you had the sensation of not emptying your bladder?",
-    category: "Incomplete Emptying",
-  },
-  {
-    question: "How often have you had to urinate less than every two hours?",
-    category: "Frequency",
-  },
-  {
-    question: "How often have you found you stopped and started again several times when you urinated?",
-    category: "Intermittency",
-  },
-  {
-    question: "How often have you found it difficult to postpone urination?",
-    category: "Urgency",
-  },
-  {
-    question: "How often have you had a weak urinary stream?",
-    category: "Weak Stream",
-  },
-  {
-    question: "How often have you had to strain to start urination?",
-    category: "Straining",
-  },
-  {
-    question: "How many times did you typically get up at night to urinate?",
-    category: "Nocturia",
-  },
-  {
-    question: "If you were to spend the rest of your life with your urinary condition just the way it is now, how would you feel about that?",
-    category: "Quality of Life",
-  },
+  { question: "How often have you had the sensation of not emptying your bladder?", category: "Incomplete Emptying" },
+  { question: "How often have you had to urinate less than every two hours?", category: "Frequency" },
+  { question: "How often have you found you stopped and started again several times when you urinated?", category: "Intermittency" },
+  { question: "How often have you found it difficult to postpone urination?", category: "Urgency" },
+  { question: "How often have you had a weak urinary stream?", category: "Weak Stream" },
+  { question: "How often have you had to strain to start urination?", category: "Straining" },
+  { question: "How many times did you typically get up at night to urinate?", category: "Nocturia" },
+  { question: "If you were to spend the rest of your life with your urinary condition just the way it is now, how would you feel about that?", category: "Quality of Life" },
 ];
 
 export const IPSS_OPTIONS_STANDARD = [
@@ -179,7 +205,6 @@ export const IPSS_OPTIONS_QOL = [
   { score: 6, label: "Terrible" },
 ];
 
-// OAB-q Questionnaire
 export const OABQ_QUESTIONS = [
   { question: "How bothered have you been by uncomfortable urination?", category: "Symptom" },
   { question: "How bothered have you been by a sudden urge to urinate with little or no warning?", category: "Symptom" },
@@ -204,39 +229,6 @@ export const OABQ_OPTIONS_TREATMENT = [
   { score: 0, label: "No" },
 ];
 
-// ICIQ-OAB Questionnaire
-export const ICIQ_OAB_QUESTIONS = [
-  { question: "How often do you pass urine during the day?", category: "Daytime Frequency", hasBother: true },
-  { question: "During the night, how many times do you have to get up to urinate, on average?", category: "Nocturia", hasBother: true },
-  { question: "Do you have to rush to the toilet to urinate?", category: "Urgency", hasBother: true },
-  { question: "Does urine leak before you can get to the toilet?", category: "Leakage", hasBother: true },
-];
-
-export const ICIQ_OAB_OPTIONS_FREQUENCY = [
-  { score: 0, label: "1 to 6 times" },
-  { score: 1, label: "7 to 8 times" },
-  { score: 2, label: "9 to 10 times" },
-  { score: 3, label: "11 to 12 times" },
-  { score: 4, label: "13 or more times" },
-];
-
-export const ICIQ_OAB_OPTIONS_NOCTURIA = [
-  { score: 0, label: "None" },
-  { score: 1, label: "One" },
-  { score: 2, label: "Two" },
-  { score: 3, label: "Three" },
-  { score: 4, label: "Four or more" },
-];
-
-export const ICIQ_OAB_OPTIONS_URGENCY = [
-  { score: 0, label: "Never" },
-  { score: 1, label: "Occasionally" },
-  { score: 2, label: "Sometimes" },
-  { score: 3, label: "Most of the time" },
-  { score: 4, label: "All of the time" },
-];
-
-// ICIQ-UI Short Form Questionnaire
 export const ICIQ_UI_QUESTIONS = [
   { question: "How often do you leak urine?", category: "Frequency", type: "options" as const },
   { question: "How much urine do you usually leak (whether you wear protection or not)?", category: "Amount", type: "options" as const },
@@ -269,4 +261,31 @@ export const ICIQ_UI_LEAKAGE_SITUATIONS = [
   "Leaks when you have finished urinating and are dressed",
   "Leaks for no obvious reason",
   "Leaks all the time",
+];
+
+export const CHIEF_COMPLAINT_LABELS: Record<ChiefComplaint, string> = {
+  frequency: 'Urinary Frequency',
+  urgency: 'Urgency',
+  nocturia: 'Nocturia',
+  incontinence: 'Incontinence / Leakage',
+  'weak-stream': 'Weak Stream',
+  hesitancy: 'Hesitancy',
+  hematuria: 'Blood in Urine',
+  'recurrent-uti': 'Recurrent UTI',
+  'pelvic-pain': 'Pelvic Pain',
+  other: 'Other',
+};
+
+export const PAST_MEDICAL_OPTIONS = [
+  'Diabetes',
+  'Hypertension',
+  'Heart Disease',
+  'Stroke',
+  'Neurological Disorder',
+  'Kidney Disease',
+  'Prostate Cancer',
+  'Bladder Cancer',
+  'BPH',
+  'Depression/Anxiety',
+  'None',
 ];

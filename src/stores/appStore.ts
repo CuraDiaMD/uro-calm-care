@@ -1,23 +1,37 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { mockIntakeEntries, mockVoidingEntries, mockLeakageEntries } from '@/data/mockData';
 import type { 
   TabType, 
   RecordTab,
+  IntakeStatus,
+  IntakeStep,
   IntakeEntry, 
   VoidingEntry, 
   LeakageEntry, 
   IPSSResult,
   OABqResult,
-  ICIQOABResult,
   ICIQUIResult,
-  ChatMessage 
+  PatientProfile,
+  Consent,
+  DailySymptomCheck,
 } from '@/types';
 
 interface AppState {
   // Navigation
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
+  
+  // Intake flow
+  intakeStatus: IntakeStatus;
+  currentIntakeStep: IntakeStep;
+  setIntakeStatus: (status: IntakeStatus) => void;
+  setCurrentIntakeStep: (step: IntakeStep) => void;
+  
+  // Patient data
+  patientProfile: PatientProfile | null;
+  consents: Consent | null;
+  setPatientProfile: (profile: PatientProfile) => void;
+  setConsents: (consents: Consent) => void;
   
   // Record modal
   isRecordOpen: boolean;
@@ -26,15 +40,22 @@ interface AppState {
   setRecordTab: (tab: RecordTab) => void;
   openRecordWithTab: (tab: RecordTab) => void;
   
+  // Diary
+  diaryStartDate: Date | null;
+  sleepTime: string | null;
+  wakeTime: string | null;
+  dailySymptomChecks: DailySymptomCheck[];
+  setDiaryStartDate: (date: Date) => void;
+  setSleepWakeTimes: (sleep: string, wake: string) => void;
+  addDailySymptomCheck: (check: DailySymptomCheck) => void;
+  
   // Data
   intakeEntries: IntakeEntry[];
   voidingEntries: VoidingEntry[];
   leakageEntries: LeakageEntry[];
   ipssResults: IPSSResult[];
   oabqResults: OABqResult[];
-  iciqOabResults: ICIQOABResult[];
   iciqUiResults: ICIQUIResult[];
-  chatMessages: ChatMessage[];
   
   // Actions
   addIntakeEntry: (entry: Omit<IntakeEntry, 'id' | 'timestamp'>) => void;
@@ -42,9 +63,7 @@ interface AppState {
   addLeakageEntry: (entry: Omit<LeakageEntry, 'id' | 'timestamp'>) => void;
   addIPSSResult: (result: Omit<IPSSResult, 'completedAt'>) => void;
   addOABqResult: (result: Omit<OABqResult, 'completedAt'>) => void;
-  addICIQOABResult: (result: Omit<ICIQOABResult, 'completedAt'>) => void;
   addICIQUIResult: (result: Omit<ICIQUIResult, 'completedAt'>) => void;
-  addChatMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
   
   // Computed
   getTodaySummary: () => {
@@ -55,6 +74,8 @@ interface AppState {
     leakageCount: number;
     totalLeakage: number;
   };
+  
+  getDiaryDaysCompleted: () => number;
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
@@ -70,10 +91,10 @@ const isDaytime = (date: Date) => {
   return hours >= 6 && hours < 22;
 };
 
-const getLeakageVolume = (size: 'small' | 'medium' | 'large') => {
+const getLeakageVolume = (size: 'drops' | 'small' | 'large') => {
   switch (size) {
-    case 'small': return 10;
-    case 'medium': return 30;
+    case 'drops': return 5;
+    case 'small': return 15;
     case 'large': return 60;
   }
 };
@@ -84,27 +105,43 @@ export const useAppStore = create<AppState>()(
       activeTab: 'home',
       setActiveTab: (tab) => set({ activeTab: tab }),
       
+      // Intake flow
+      intakeStatus: 'not-started',
+      currentIntakeStep: 0 as IntakeStep,
+      setIntakeStatus: (status) => set({ intakeStatus: status }),
+      setCurrentIntakeStep: (step) => set({ currentIntakeStep: step }),
+      
+      // Patient data
+      patientProfile: null,
+      consents: null,
+      setPatientProfile: (profile) => set({ patientProfile: profile }),
+      setConsents: (consents) => set({ consents }),
+      
+      // Record modal
       isRecordOpen: false,
       recordTab: 'intake',
       setRecordOpen: (open) => set({ isRecordOpen: open }),
       setRecordTab: (tab) => set({ recordTab: tab }),
       openRecordWithTab: (tab) => set({ recordTab: tab, isRecordOpen: true }),
       
-      intakeEntries: mockIntakeEntries,
-      voidingEntries: mockVoidingEntries,
-      leakageEntries: mockLeakageEntries,
+      // Diary
+      diaryStartDate: null,
+      sleepTime: '22:00',
+      wakeTime: '06:00',
+      dailySymptomChecks: [],
+      setDiaryStartDate: (date) => set({ diaryStartDate: date }),
+      setSleepWakeTimes: (sleep, wake) => set({ sleepTime: sleep, wakeTime: wake }),
+      addDailySymptomCheck: (check) => set((state) => ({
+        dailySymptomChecks: [...state.dailySymptomChecks, check]
+      })),
+      
+      // Data — start empty (no mock data in intake flow)
+      intakeEntries: [],
+      voidingEntries: [],
+      leakageEntries: [],
       ipssResults: [],
       oabqResults: [],
-      iciqOabResults: [],
       iciqUiResults: [],
-      chatMessages: [
-        {
-          id: 'welcome',
-          role: 'assistant',
-          content: "Hello, I'm Dia. I'm here to help you better understand your urological health journey. Feel free to ask me any questions about bladder health, the questionnaires, or how to use this app.",
-          timestamp: new Date(),
-        }
-      ],
       
       addIntakeEntry: (entry) => set((state) => ({
         intakeEntries: [
@@ -141,24 +178,10 @@ export const useAppStore = create<AppState>()(
         ]
       })),
       
-      addICIQOABResult: (result) => set((state) => ({
-        iciqOabResults: [
-          ...state.iciqOabResults,
-          { ...result, completedAt: new Date() }
-        ]
-      })),
-      
       addICIQUIResult: (result) => set((state) => ({
         iciqUiResults: [
           ...state.iciqUiResults,
           { ...result, completedAt: new Date() }
-        ]
-      })),
-      
-      addChatMessage: (message) => set((state) => ({
-        chatMessages: [
-          ...state.chatMessages,
-          { ...message, id: generateId(), timestamp: new Date() }
         ]
       })),
       
@@ -177,17 +200,34 @@ export const useAppStore = create<AppState>()(
           totalLeakage: todayLeakages.reduce((sum, e) => sum + getLeakageVolume(e.size), 0),
         };
       },
+      
+      getDiaryDaysCompleted: () => {
+        const state = get();
+        if (!state.diaryStartDate) return 0;
+        const start = new Date(state.diaryStartDate);
+        const now = new Date();
+        const diffMs = now.getTime() - start.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        return Math.min(diffDays, 3);
+      },
     }),
     {
       name: 'curadia-storage',
       partialize: (state) => ({
+        intakeStatus: state.intakeStatus,
+        currentIntakeStep: state.currentIntakeStep,
+        patientProfile: state.patientProfile,
+        consents: state.consents,
         intakeEntries: state.intakeEntries,
         voidingEntries: state.voidingEntries,
         leakageEntries: state.leakageEntries,
         ipssResults: state.ipssResults,
         oabqResults: state.oabqResults,
-        iciqOabResults: state.iciqOabResults,
         iciqUiResults: state.iciqUiResults,
+        diaryStartDate: state.diaryStartDate,
+        sleepTime: state.sleepTime,
+        wakeTime: state.wakeTime,
+        dailySymptomChecks: state.dailySymptomChecks,
       }),
     }
   )

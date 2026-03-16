@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Droplet, Coffee, CupSoda, Citrus, Beer, GlassWater } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
-import { VOLUME_PRESETS, type BeverageType, type LeakageSize, type RecordTab } from '@/types';
+import { VOLUME_PRESETS, URGE_SCALE_LABELS, type BeverageType, type LeakageSize, type LeakageType, type RecordTab } from '@/types';
 import { toast } from 'sonner';
 
 const beverages: { type: BeverageType; icon: typeof Droplet; label: string }[] = [
@@ -24,13 +24,16 @@ export function RecordModal() {
   
   // Voiding state
   const [voidVolume, setVoidVolume] = useState('');
-  const [urgeScale, setUrgeScale] = useState<1 | 2 | 3 | 4 | 5>(3);
+  const [urgeScale, setUrgeScale] = useState<0 | 1 | 2 | 3 | 4>(2);
   const [isSleep, setIsSleep] = useState(false);
   const [hasLeak, setHasLeak] = useState(false);
   const [voidMemo, setVoidMemo] = useState('');
   
   // Leakage state
   const [leakageSize, setLeakageSize] = useState<LeakageSize>('small');
+  const [leakageActivity, setLeakageActivity] = useState('');
+  const [leakageType, setLeakageType] = useState<LeakageType>('unknown');
+  const [padUsed, setPadUsed] = useState(false);
   const [leakageMemo, setLeakageMemo] = useState('');
   
   if (!isRecordOpen) return null;
@@ -41,11 +44,14 @@ export function RecordModal() {
     setCustomVolume('');
     setIntakeMemo('');
     setVoidVolume('');
-    setUrgeScale(3);
+    setUrgeScale(2);
     setIsSleep(false);
     setHasLeak(false);
     setVoidMemo('');
     setLeakageSize('small');
+    setLeakageActivity('');
+    setLeakageType('unknown');
+    setPadUsed(false);
     setLeakageMemo('');
   };
   
@@ -72,7 +78,13 @@ export function RecordModal() {
       });
       toast.success('Voiding entry saved');
     } else {
-      addLeakageEntry({ size: leakageSize, memo: leakageMemo || undefined });
+      addLeakageEntry({
+        size: leakageSize,
+        activity: leakageActivity,
+        type: leakageType,
+        padUsed,
+        memo: leakageMemo || undefined,
+      });
       toast.success('Leakage entry saved');
     }
     
@@ -180,9 +192,9 @@ export function RecordModal() {
               </div>
               
               <div>
-                <label className="text-xs font-medium text-foreground mb-1.5 block">Urge Scale (1-5)</label>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Urgency (0-4)</label>
                 <div className="flex gap-1.5">
-                  {([1, 2, 3, 4, 5] as const).map((scale) => (
+                  {([0, 1, 2, 3, 4] as const).map((scale) => (
                     <button
                       key={scale}
                       onClick={() => setUrgeScale(scale)}
@@ -197,7 +209,7 @@ export function RecordModal() {
                   ))}
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1 text-center">
-                  1 = No urge → 5 = Severe urge
+                  {URGE_SCALE_LABELS[urgeScale]}
                 </p>
               </div>
               
@@ -237,20 +249,54 @@ export function RecordModal() {
               <div>
                 <label className="text-xs font-medium text-foreground mb-1.5 block">Leakage Size</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {(['small', 'medium', 'large'] as LeakageSize[]).map((size) => (
+                  {(['drops', 'small', 'large'] as LeakageSize[]).map((size) => (
                     <button
                       key={size}
                       onClick={() => setLeakageSize(size)}
                       className={`compact-btn py-3 ${leakageSize === size ? 'border-primary bg-primary/10' : ''}`}
                     >
                       <span className="text-xl">
-                        {size === 'small' ? '💧' : size === 'medium' ? '💧💧' : '💧💧💧'}
+                        {size === 'drops' ? '💧' : size === 'small' ? '💧💧' : '💧💧💧'}
                       </span>
                       <span className="text-xs font-medium capitalize">{size}</span>
                     </button>
                   ))}
                 </div>
               </div>
+              
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Leakage Type</label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(['stress', 'urge', 'mixed', 'unknown'] as LeakageType[]).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setLeakageType(type)}
+                      className={`compact-btn py-2 capitalize ${leakageType === type ? 'border-primary bg-primary/10' : ''}`}
+                    >
+                      <span className="text-xs font-medium">{type}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Activity at time of leak</label>
+                <input
+                  placeholder="e.g., coughing, walking, laughing..."
+                  value={leakageActivity}
+                  onChange={(e) => setLeakageActivity(e.target.value)}
+                  className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
+                />
+              </div>
+              
+              <button
+                onClick={() => setPadUsed(!padUsed)}
+                className={`w-full p-2 rounded-lg border-2 text-xs font-medium transition-all ${
+                  padUsed ? 'border-primary bg-primary/10 text-primary' : 'border-border'
+                }`}
+              >
+                🩹 Pad Used: {padUsed ? 'Yes' : 'No'}
+              </button>
               
               <div>
                 <label className="text-xs font-medium text-foreground mb-1.5 block">Memo (optional)</label>
