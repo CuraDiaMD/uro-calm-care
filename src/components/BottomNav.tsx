@@ -1,13 +1,12 @@
-import { Home, Calendar, FileText, MessageCircle, Plus } from 'lucide-react';
+import { Home, Calendar, FileText, Plus } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import type { TabType } from '@/types';
 
 const navItems: { id: TabType; icon: typeof Home; label: string }[] = [
   { id: 'home', icon: Home, label: 'Home' },
-  { id: 'calendar', icon: Calendar, label: 'Summary' },
+  { id: 'diary', icon: Calendar, label: 'Diary' },
   { id: 'record', icon: Plus, label: 'Record' },
   { id: 'forms', icon: FileText, label: 'Forms' },
-  { id: 'chat', icon: MessageCircle, label: 'Dia AI' },
 ];
 
 export function BottomNav() {
@@ -24,7 +23,7 @@ export function BottomNav() {
   return (
     <nav className="bottom-nav border-t border-white/30 flex-shrink-0" style={{ background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
       <div className="max-w-md mx-auto flex items-center justify-around h-14">
-        {navItems.map((item, index) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isRecord = item.id === 'record';
           const isActive = activeTab === item.id;

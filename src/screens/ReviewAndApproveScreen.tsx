@@ -1,0 +1,109 @@
+import { CheckCircle, User, FileText, ClipboardList } from 'lucide-react';
+import { useAppStore } from '@/stores/appStore';
+import { toast } from 'sonner';
+
+export function ReviewAndApproveScreen() {
+  const patientProfile = useAppStore((state) => state.patientProfile);
+  const consents = useAppStore((state) => state.consents);
+  const ipssResults = useAppStore((state) => state.ipssResults);
+  const oabqResults = useAppStore((state) => state.oabqResults);
+  const iciqUiResults = useAppStore((state) => state.iciqUiResults);
+  const intakeEntries = useAppStore((state) => state.intakeEntries);
+  const voidingEntries = useAppStore((state) => state.voidingEntries);
+  const leakageEntries = useAppStore((state) => state.leakageEntries);
+  const setIntakeStatus = useAppStore((state) => state.setIntakeStatus);
+  const setDiaryStartDate = useAppStore((state) => state.setDiaryStartDate);
+  
+  const handleSubmit = () => {
+    toast.success('Data submitted to your care team!');
+    setDiaryStartDate(new Date());
+    setIntakeStatus('completed');
+  };
+  
+  return (
+    <div className="screen-container gap-3 justify-between">
+      <h1 className="text-lg font-bold text-foreground flex-shrink-0">Review & Submit</h1>
+      
+      <div className="flex-1 overflow-y-auto space-y-3 min-h-0">
+        {/* Profile Summary */}
+        <div className="compact-card space-y-2">
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">Patient Profile</h3>
+          </div>
+          {patientProfile ? (
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p><span className="text-foreground font-medium">Name:</span> {patientProfile.firstName} {patientProfile.lastName}</p>
+              <p><span className="text-foreground font-medium">Sex:</span> {patientProfile.sexAtBirth}</p>
+              <p><span className="text-foreground font-medium">Complaints:</span> {patientProfile.chiefComplaints.join(', ')}</p>
+              {patientProfile.pastMedicalHistory.length > 0 && (
+                <p><span className="text-foreground font-medium">Medical Hx:</span> {patientProfile.pastMedicalHistory.join(', ')}</p>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Not completed</p>
+          )}
+        </div>
+        
+        {/* Consents */}
+        <div className="compact-card space-y-2">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-success" />
+            <h3 className="text-sm font-semibold text-foreground">Consents</h3>
+          </div>
+          {consents ? (
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Clinical Data: {consents.clinicalData ? '✅ Accepted' : '❌ Declined'}</p>
+              <p>Research: {consents.researchData ? '✅ Accepted' : '❌ Declined'}</p>
+              <p>Communication: {consents.communication ? '✅ Accepted' : '❌ Declined'}</p>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Not completed</p>
+          )}
+        </div>
+        
+        {/* Questionnaires */}
+        <div className="compact-card space-y-2">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-secondary" />
+            <h3 className="text-sm font-semibold text-foreground">Questionnaires</h3>
+          </div>
+          <div className="text-xs text-muted-foreground space-y-1">
+            {ipssResults.length > 0 && (
+              <p>IPSS: Score {ipssResults[ipssResults.length - 1].totalScore}/35</p>
+            )}
+            {oabqResults.length > 0 && (
+              <p>OAB-q: Symptom {oabqResults[oabqResults.length - 1].symptomScore}/30</p>
+            )}
+            {iciqUiResults.length > 0 && (
+              <p>ICIQ-UI: Score {iciqUiResults[iciqUiResults.length - 1].totalScore}/21</p>
+            )}
+            {ipssResults.length === 0 && oabqResults.length === 0 && iciqUiResults.length === 0 && (
+              <p>No questionnaires completed yet</p>
+            )}
+          </div>
+        </div>
+        
+        {/* Diary Summary */}
+        <div className="compact-card space-y-2">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">Diary Data</h3>
+          </div>
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p>{intakeEntries.length} intake entries</p>
+            <p>{voidingEntries.length} voiding entries</p>
+            <p>{leakageEntries.length} leakage entries</p>
+          </div>
+        </div>
+      </div>
+      
+      <button
+        onClick={handleSubmit}
+        className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base active:scale-[0.98] transition-transform flex-shrink-0"
+      >
+        Approve & Submit to Clinic
+      </button>
+    </div>
+  );
+}
