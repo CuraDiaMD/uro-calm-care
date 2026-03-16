@@ -91,10 +91,12 @@ interface AppState {
   
   // Diary
   diaryStartDate: Date | null;
+  selectedDiaryDate: Date;
   sleepTime: string | null;
   wakeTime: string | null;
   dailySymptomChecks: DailySymptomCheck[];
   setDiaryStartDate: (date: Date) => void;
+  setSelectedDiaryDate: (date: Date) => void;
   setSleepWakeTimes: (sleep: string, wake: string) => void;
   addDailySymptomCheck: (check: DailySymptomCheck) => void;
   
@@ -115,6 +117,14 @@ interface AppState {
   addICIQUIResult: (result: Omit<ICIQUIResult, 'completedAt'>) => void;
   
   // Computed
+  getSummaryForDate: (date: Date) => {
+    totalIntake: number;
+    totalVoided: number;
+    daytimeFrequency: number;
+    nighttimeFrequency: number;
+    leakageCount: number;
+    totalLeakage: number;
+  };
   getTodaySummary: () => {
     totalIntake: number;
     totalVoided: number;
