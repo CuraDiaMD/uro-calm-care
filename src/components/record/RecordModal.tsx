@@ -87,7 +87,7 @@ export function RecordModal() {
         memo: voidMemo || undefined,
       });
       toast.success('Voiding entry saved');
-    } else {
+    } else if (recordTab === 'leakage') {
       addLeakageEntry({
         size: leakageSize,
         activity: leakageActivity,
@@ -96,6 +96,13 @@ export function RecordModal() {
         memo: leakageMemo || undefined,
       });
       toast.success('Leakage entry saved');
+    } else if (recordTab === 'symptoms') {
+      const check: DailySymptomCheck = {
+        date: new Date(),
+        ...symptoms,
+      };
+      addDailySymptomCheck(check);
+      toast.success('Symptoms saved');
     }
     
     resetForm();
