@@ -62,6 +62,7 @@ export function RecordModal() {
     setLeakageType('unknown');
     setPadUsed(false);
     setLeakageMemo('');
+    setSymptoms({ dysuria: false, pain: false, hematuria: false, fever: false, padUse: 'none' });
   };
   
   const handleSave = () => {
