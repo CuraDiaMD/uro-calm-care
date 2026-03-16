@@ -140,7 +140,7 @@ export function CalendarScreen() {
             <Activity className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs font-medium text-foreground">Voiding</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">{summary.totalVoided}</p>
+          <p className="text-3xl font-bold text-foreground">{summary.totalVoided}</p>
           <p className="text-xs text-muted-foreground">{summary.voidCount} voids</p>
         </div>
       </div>
