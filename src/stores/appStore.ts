@@ -299,6 +299,7 @@ export const useAppStore = create<AppState>()(
         oabqResults: state.oabqResults,
         iciqUiResults: state.iciqUiResults,
         diaryStartDate: state.diaryStartDate,
+        selectedDiaryDate: state.selectedDiaryDate,
         sleepTime: state.sleepTime,
         wakeTime: state.wakeTime,
         dailySymptomChecks: state.dailySymptomChecks,
