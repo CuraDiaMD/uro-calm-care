@@ -62,6 +62,10 @@ export const EMPTY_PROFILE: PatientProfile = {
 };
 
 interface AppState {
+  // Language
+  language: 'en' | 'fr';
+  setLanguage: (lang: 'en' | 'fr') => void;
+  
   // Navigation
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
