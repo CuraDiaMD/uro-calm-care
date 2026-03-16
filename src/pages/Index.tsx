@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { RecordModal } from '@/components/record/RecordModal';
-import { HomeScreen } from '@/screens/HomeScreen';
 import { CalendarScreen } from '@/screens/CalendarScreen';
 import { FormsScreen } from '@/screens/FormsScreen';
 import { MagicLinkLandingScreen } from '@/screens/MagicLinkLandingScreen';
@@ -57,17 +56,16 @@ const Index = () => {
     );
   }
   
-  // Completed — tabbed interface
+  // Completed — diary is main view, tabs for questionnaires & summary
   const renderScreen = () => {
     switch (activeTab) {
-      case 'home':
-        return <HomeScreen />;
-      case 'diary':
-        return <CalendarScreen />;
       case 'forms':
         return <FormsScreen />;
+      case 'summary':
+        return <ReviewAndApproveScreen />;
+      case 'diary':
       default:
-        return <HomeScreen />;
+        return <CalendarScreen />;
     }
   };
   

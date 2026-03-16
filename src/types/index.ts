@@ -6,7 +6,7 @@ export type LeakageSize = 'drops' | 'small' | 'large';
 
 export type LeakageType = 'stress' | 'urge' | 'mixed' | 'unknown';
 
-export type TabType = 'home' | 'diary' | 'record' | 'forms';
+export type TabType = 'diary' | 'record' | 'forms' | 'summary';
 
 export type RecordTab = 'intake' | 'voiding' | 'leakage';
 
@@ -28,6 +28,83 @@ export type ChiefComplaint =
   | 'pelvic-pain'
   | 'other';
 
+// ── Past Medical History (categorized) ──
+
+export interface PastMedicalHistory {
+  endocrine: string[];
+  cardiovascular: string[];
+  neurological: string[];
+  kidneyUrologic: string[];
+  cancer: string[];
+  cancerOther: string;
+  other: string[];
+}
+
+export const PMH_ENDOCRINE = ['Diabetes Type 1', 'Diabetes Type 2'] as const;
+export const PMH_CARDIOVASCULAR = ['Hypertension', 'CAD', 'Heart Failure', 'Atrial Fibrillation'] as const;
+export const PMH_NEUROLOGICAL = ['Stroke/TIA', "Parkinson's", 'MS', 'Spinal Cord Injury', "Alzheimer's/Dementia"] as const;
+export const PMH_KIDNEY_UROLOGIC = ['Kidney Stones', 'CKD', 'Frequent UTIs', 'BPH'] as const;
+export const PMH_CANCER = ['Prostate Cancer', 'Bladder Cancer', 'Kidney Cancer', 'Testicular Cancer', 'Pelvic Radiation/Chemo'] as const;
+export const PMH_OTHER = ['Asthma/COPD/Sleep Apnea', 'Bleeding Disorders', "Crohn's/UC"] as const;
+
+// ── Surgical History (categorized) ──
+
+export interface SurgicalEntry {
+  name: string;
+  year?: string;
+  meshUsed?: boolean; // only for hernia repair
+}
+
+export interface PastSurgicalHistory {
+  urologic: SurgicalEntry[];
+  general: SurgicalEntry[];
+}
+
+export const SURG_UROLOGIC = ['Prostate Surgery', 'Kidney Surgery', 'Bladder Surgery', 'Vasectomy', 'Hysterectomy/C-section', 'Pelvic Floor Repair'] as const;
+export const SURG_GENERAL = ['Hernia Repair', 'Bowel Surgery', 'Bariatric Surgery'] as const;
+
+// ── Family History ──
+
+export interface FamilyHistory {
+  conditions: string[];
+  other: string;
+}
+
+export const FAMILY_HX_OPTIONS = ['Prostate Cancer', 'Bladder Cancer', 'Kidney Cancer', 'Kidney Stones'] as const;
+
+// ── Medications (structured) ──
+
+export interface Medications {
+  diabetesMeds: string[];
+  diabetesMedsOther: string;
+  bloodThinners: string[];
+  bpMeds: string;
+  diuretics: boolean;
+  urologicMeds: string[];
+  otherPrescriptions: string;
+  supplements: string[];
+  supplementsOther: string;
+}
+
+export const DIABETES_MEDS = ['Insulin', 'Metformin', 'SGLT2 Inhibitors', 'GLP-1 Agonists'] as const;
+export const BLOOD_THINNERS = ['Aspirin', 'Plavix', 'Coumadin', 'Eliquis/Xarelto'] as const;
+export const UROLOGIC_MEDS = ['Tamsulosin (Flomax)', 'Finasteride', 'Dutasteride', 'Oxybutynin', 'Mirabegron', 'Tolterodine'] as const;
+export const SUPPLEMENTS = ['Saw Palmetto', 'Vitamin C/Calcium'] as const;
+
+// ── Allergies ──
+
+export interface AllergyEntry {
+  allergen: string;
+  reaction: string;
+}
+
+export interface Allergies {
+  noKnownAllergies: boolean;
+  entries: AllergyEntry[];
+}
+
+// ── Patient Profile ──
+
 export interface PatientProfile {
   firstName: string;
   lastName: string;
@@ -39,11 +116,11 @@ export interface PatientProfile {
   email: string;
   familyPhysician: string;
   chiefComplaints: ChiefComplaint[];
-  pastMedicalHistory: string[];
-  pastSurgicalHistory: string;
-  familyHistory: string;
-  medications: string;
-  allergies: string;
+  pastMedicalHistory: PastMedicalHistory;
+  pastSurgicalHistory: PastSurgicalHistory;
+  familyHistory: FamilyHistory;
+  medications: Medications;
+  allergies: Allergies;
 }
 
 export interface Consent {
@@ -275,17 +352,3 @@ export const CHIEF_COMPLAINT_LABELS: Record<ChiefComplaint, string> = {
   'pelvic-pain': 'Pelvic Pain',
   other: 'Other',
 };
-
-export const PAST_MEDICAL_OPTIONS = [
-  'Diabetes',
-  'Hypertension',
-  'Heart Disease',
-  'Stroke',
-  'Neurological Disorder',
-  'Kidney Disease',
-  'Prostate Cancer',
-  'Bladder Cancer',
-  'BPH',
-  'Depression/Anxiety',
-  'None',
-];

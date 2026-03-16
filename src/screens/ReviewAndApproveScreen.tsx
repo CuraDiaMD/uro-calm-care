@@ -11,18 +11,31 @@ export function ReviewAndApproveScreen() {
   const intakeEntries = useAppStore((state) => state.intakeEntries);
   const voidingEntries = useAppStore((state) => state.voidingEntries);
   const leakageEntries = useAppStore((state) => state.leakageEntries);
+  const intakeStatus = useAppStore((state) => state.intakeStatus);
   const setIntakeStatus = useAppStore((state) => state.setIntakeStatus);
   const setDiaryStartDate = useAppStore((state) => state.setDiaryStartDate);
+  
+  const isIntakeFlow = intakeStatus === 'in-progress';
   
   const handleSubmit = () => {
     toast.success('Data submitted to your care team!');
     setDiaryStartDate(new Date());
     setIntakeStatus('completed');
   };
+
+  // Collect PMH items for display
+  const pmhItems: string[] = [];
+  if (patientProfile) {
+    const pmh = patientProfile.pastMedicalHistory;
+    pmhItems.push(...pmh.endocrine, ...pmh.cardiovascular, ...pmh.neurological, ...pmh.kidneyUrologic, ...pmh.cancer, ...pmh.other);
+    if (pmh.cancerOther) pmhItems.push(pmh.cancerOther);
+  }
   
   return (
     <div className="screen-container gap-3 justify-between">
-      <h1 className="text-lg font-bold text-foreground flex-shrink-0">Review & Submit</h1>
+      <h1 className="text-lg font-bold text-foreground flex-shrink-0">
+        {isIntakeFlow ? 'Review & Submit' : 'Summary'}
+      </h1>
       
       <div className="flex-1 overflow-y-auto space-y-3 min-h-0">
         {/* Profile Summary */}
@@ -36,8 +49,20 @@ export function ReviewAndApproveScreen() {
               <p><span className="text-foreground font-medium">Name:</span> {patientProfile.firstName} {patientProfile.lastName}</p>
               <p><span className="text-foreground font-medium">Sex:</span> {patientProfile.sexAtBirth}</p>
               <p><span className="text-foreground font-medium">Complaints:</span> {patientProfile.chiefComplaints.join(', ')}</p>
-              {patientProfile.pastMedicalHistory.length > 0 && (
-                <p><span className="text-foreground font-medium">Medical Hx:</span> {patientProfile.pastMedicalHistory.join(', ')}</p>
+              {pmhItems.length > 0 && (
+                <p><span className="text-foreground font-medium">Medical Hx:</span> {pmhItems.join(', ')}</p>
+              )}
+              {patientProfile.pastSurgicalHistory.urologic.length + patientProfile.pastSurgicalHistory.general.length > 0 && (
+                <p><span className="text-foreground font-medium">Surgical Hx:</span> {[
+                  ...patientProfile.pastSurgicalHistory.urologic,
+                  ...patientProfile.pastSurgicalHistory.general,
+                ].map(e => e.year ? `${e.name} (${e.year})` : e.name).join(', ')}</p>
+              )}
+              {patientProfile.allergies.noKnownAllergies && (
+                <p><span className="text-foreground font-medium">Allergies:</span> NKDA</p>
+              )}
+              {patientProfile.allergies.entries.length > 0 && (
+                <p><span className="text-foreground font-medium">Allergies:</span> {patientProfile.allergies.entries.map(a => a.allergen).join(', ')}</p>
               )}
             </div>
           ) : (
@@ -98,12 +123,14 @@ export function ReviewAndApproveScreen() {
         </div>
       </div>
       
-      <button
-        onClick={handleSubmit}
-        className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base active:scale-[0.98] transition-transform flex-shrink-0"
-      >
-        Approve & Submit to Clinic
-      </button>
+      {isIntakeFlow && (
+        <button
+          onClick={handleSubmit}
+          className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base active:scale-[0.98] transition-transform flex-shrink-0"
+        >
+          Approve & Submit to Clinic
+        </button>
+      )}
     </div>
   );
 }
