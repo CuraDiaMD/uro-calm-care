@@ -363,8 +363,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
                   placeholder={t.profile.specify} />
               </div>
               <div className="flex items-end">
-                <button onClick={() => setProfile(p => ({ ...p, medications: { ...p.medications, diuretics: !p.medications.diuretics } }))}
-                  className={`w-full compact-btn py-2.5 ${profile.medications.diuretics ? 'border-primary bg-primary/10' : ''}`}>
+                <button
+                  type="button"
+                  data-selected={profile.medications.diuretics}
+                  aria-pressed={profile.medications.diuretics}
+                  onClick={() => setProfile(p => ({ ...p, medications: { ...p.medications, diuretics: !p.medications.diuretics } }))}
+                  className="w-full compact-btn py-2.5"
+                >
                   <span className="text-[11px] font-medium text-foreground">{t.profile.diuretics}</span>
                 </button>
               </div>
