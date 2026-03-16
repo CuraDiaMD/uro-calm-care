@@ -1,10 +1,19 @@
-import { AlertCircle, Droplets, Moon, Plus, Sun } from 'lucide-react';
+import { AlertCircle, Droplets, Moon, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { useShallow } from 'zustand/react/shallow';
 
+const formatDiaryDate = (date: Date) => {
+  const day = `${date.getDate()}`.padStart(2, '0');
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
+
 export function DailySummaryCard() {
   const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+  const selectedDiaryDate = useAppStore((state) => state.selectedDiaryDate);
   const sleepTime = useAppStore((state) => state.sleepTime);
   const wakeTime = useAppStore((state) => state.wakeTime);
   const summary = useAppStore(useShallow((state) => state.getSummaryForDate(state.selectedDiaryDate)));
@@ -12,8 +21,12 @@ export function DailySummaryCard() {
   const hasLeakage = summary.leakageCount > 0 || summary.totalLeakage > 0;
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-2 gap-2">
+    <div className="compact-card flex-[4] flex flex-col gap-3">
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Date</p>
+          <p className="text-sm font-semibold text-foreground">{formatDiaryDate(new Date(selectedDiaryDate))}</p>
+        </div>
         <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{t.calendar.wake}</p>
           <p className="text-sm font-semibold text-foreground">{wakeTime || '06:00'}</p>
@@ -24,42 +37,26 @@ export function DailySummaryCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <div className="relative rounded-xl border border-border bg-secondary/5 p-4 min-h-[148px] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Droplets className="w-4 h-4 text-secondary" />
-              <h3 className="text-sm font-semibold text-foreground">{t.calendar.intake}</h3>
-            </div>
-            <p className="text-3xl font-bold text-foreground">{summary.totalIntake}</p>
-            <p className="text-sm text-muted-foreground">{t.calendar.mlTotal}</p>
+      <div className="relative p-4 rounded-xl bg-primary/5 border border-primary/10 flex-1 flex flex-col justify-center">
+        {hasLeakage && (
+          <div className="absolute right-3 top-3 w-8 h-8 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center">
+            <AlertCircle className="w-4 h-4 text-destructive" />
           </div>
-
+        )}
+        <div className="flex items-center justify-between mb-3 pr-10">
+          <h3 className="text-sm font-semibold text-primary">{t.calendar.voiding}</h3>
           <button
-            onClick={() => openRecordWithTab('intake')}
-            aria-label={`Add ${t.record.intake}`}
-            className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-warning text-primary-foreground shadow-sm transition-all hover:scale-105 active:scale-95"
+            onClick={() => openRecordWithTab('voiding')}
+            className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 active:scale-95 transition-all cursor-pointer"
           >
-            <Plus className="h-4 w-4" />
+            <Droplets className="w-5 h-5 text-primary" />
           </button>
         </div>
-
-        <div className="relative rounded-xl border border-primary/10 bg-primary/5 p-4 min-h-[148px] flex flex-col justify-between">
-          {hasLeakage && (
-            <div className="absolute right-3 top-3 w-8 h-8 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center">
-              <AlertCircle className="w-4 h-4 text-destructive" />
-            </div>
-          )}
-
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="flex items-center gap-1.5 mb-2 pr-10">
-              <Droplets className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold text-primary">{t.calendar.voiding}</h3>
-            </div>
             <p className="text-3xl font-bold text-foreground">{summary.totalVoided}</p>
             <p className="text-sm text-muted-foreground">{t.home.totalMl}</p>
           </div>
-
           <div className="flex gap-4 items-center">
             <div className="flex items-center gap-2">
               <Sun className="w-5 h-5 text-warning" />
@@ -76,14 +73,6 @@ export function DailySummaryCard() {
               </div>
             </div>
           </div>
-
-          <button
-            onClick={() => openRecordWithTab('voiding')}
-            aria-label={`Add ${t.record.voiding}`}
-            className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-warning text-primary-foreground shadow-sm transition-all hover:scale-105 active:scale-95"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
         </div>
       </div>
     </div>
