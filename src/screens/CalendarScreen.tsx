@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Droplets, Activity, AlertCircle, Moon, Sun, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Droplets, Activity, AlertCircle, Moon, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
-import type { DailySymptomCheck } from '@/types';
 
 export function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -14,28 +13,8 @@ export function CalendarScreen() {
   const wakeTime = useAppStore((state) => state.wakeTime);
   const setSleepWakeTimes = useAppStore((state) => state.setSleepWakeTimes);
   const getDiaryDaysCompleted = useAppStore((state) => state.getDiaryDaysCompleted);
-  const dailySymptomChecks = useAppStore((state) => state.dailySymptomChecks);
-  const addDailySymptomCheck = useAppStore((state) => state.addDailySymptomCheck);
   
   const daysCompleted = getDiaryDaysCompleted();
-  
-  // Symptom check state for today
-  const todayCheck = dailySymptomChecks.find(c => isSameDay(new Date(c.date), selectedDate));
-  const [symptoms, setSymptoms] = useState({
-    dysuria: todayCheck?.dysuria || false,
-    pain: todayCheck?.pain || false,
-    hematuria: todayCheck?.hematuria || false,
-    fever: todayCheck?.fever || false,
-    padUse: todayCheck?.padUse || 'none' as 'none' | '1-2' | '3+',
-  });
-  
-  const handleSaveSymptoms = () => {
-    const check: DailySymptomCheck = {
-      date: selectedDate,
-      ...symptoms,
-    };
-    addDailySymptomCheck(check);
-  };
   
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(subDays(selectedDate, 3), i));
   
