@@ -73,7 +73,7 @@ export function CalendarScreen() {
               type="time"
               value={wakeTime || '06:00'}
               onChange={(e) => setSleepWakeTimes(sleepTime || '22:00', e.target.value)}
-              className="w-full text-sm font-medium text-foreground bg-transparent outline-none"
+              className="w-full text-base font-medium text-foreground bg-transparent outline-none"
             />
           </div>
         </div>
