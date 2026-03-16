@@ -125,11 +125,11 @@ export function RecordModal() {
         
         {/* Tabs */}
         <div className="flex border-b border-border flex-shrink-0">
-          {(['intake', 'voiding', 'leakage'] as RecordTab[]).map((tab) => (
+          {(['intake', 'voiding', 'leakage', 'symptoms'] as RecordTab[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setRecordTab(tab)}
-              className={`tab-btn py-2 text-sm ${recordTab === tab ? 'active' : ''}`}
+              className={`tab-btn py-2 text-xs ${recordTab === tab ? 'active' : ''}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
