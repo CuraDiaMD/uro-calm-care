@@ -13,6 +13,15 @@ export const fr: TranslationSchema = {
     resetConfirm: 'Réinitialiser toutes les données et recommencer ?',
   },
 
+  // Password Gate
+  passwordGate: {
+    prompt: 'Entrez le mot de passe de démonstration pour continuer',
+    placeholder: 'Mot de passe',
+    incorrect: 'Mot de passe incorrect',
+    continue: 'Continuer',
+    languageToggle: 'Changer de langue',
+  },
+
   // Magic Link Landing
   landing: {
     welcome: 'Bienvenue sur Uro-OS',

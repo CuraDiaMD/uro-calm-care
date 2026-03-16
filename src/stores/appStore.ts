@@ -151,7 +151,7 @@ const getLeakageVolume = (size: 'drops' | 'small' | 'large') => {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      language: 'en' as 'en' | 'fr',
+      language: 'fr' as 'en' | 'fr',
       setLanguage: (lang: 'en' | 'fr') => set({ language: lang }),
       
       activeTab: 'diary',

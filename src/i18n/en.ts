@@ -11,6 +11,15 @@ export const en = {
     resetConfirm: 'Reset all data and start over?',
   },
 
+  // Password Gate
+  passwordGate: {
+    prompt: 'Enter the demo password to continue',
+    placeholder: 'Password',
+    incorrect: 'Incorrect password',
+    continue: 'Continue',
+    languageToggle: 'Switch language',
+  },
+
   // Magic Link Landing
   landing: {
     welcome: 'Welcome to Uro-OS',
