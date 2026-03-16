@@ -25,7 +25,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 const SECTIONS = ['Demographics', 'Complaints', 'Medical Hx', 'Surgical Hx', 'Family Hx', 'Medications', 'Allergies'];
 
-export function PatientProfileScreen() {
+interface PatientProfileScreenProps {
+  isEditMode?: boolean;
+  onEditComplete?: () => void;
+}
+
+export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProfileScreenProps = {}) {
   const existingProfile = useAppStore((state) => state.patientProfile);
   const setPatientProfile = useAppStore((state) => state.setPatientProfile);
   const setCurrentIntakeStep = useAppStore((state) => state.setCurrentIntakeStep);
