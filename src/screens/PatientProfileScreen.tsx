@@ -504,9 +504,17 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             Back
           </button>
         )}
-        <button onClick={handleContinue}
+        <button onClick={() => {
+            if (isEditMode && section === SECTIONS.length - 1) {
+              setPatientProfile(profile);
+              toast.success('Profile updated');
+              onEditComplete?.();
+            } else {
+              handleContinue();
+            }
+          }}
           className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform">
-          {section === SECTIONS.length - 1 ? 'Continue to Questionnaires' : 'Continue'}
+          {section === SECTIONS.length - 1 ? (isEditMode ? 'Save Changes' : 'Continue to Questionnaires') : 'Continue'}
         </button>
       </div>
     </div>
