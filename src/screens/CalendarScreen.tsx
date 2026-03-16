@@ -30,7 +30,7 @@ export function CalendarScreen() {
   };
   
   return (
-    <div className="screen-container gap-3">
+    <div className="screen-container gap-4">
       {/* Diary Progress */}
       {diaryStartDate && (
         <div className="compact-card flex-shrink-0">
