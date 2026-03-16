@@ -107,11 +107,22 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
 
   const CheckboxGrid = ({ items, selected, onToggle, cols = 2 }: { items: readonly string[]; selected: string[]; onToggle: (item: string) => void; cols?: number }) => (
     <div className={`grid gap-1.5 ${cols === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-      {items.map(item => (
-        <button key={item} onClick={() => onToggle(item)} className={`compact-btn py-2 text-left ${selected.includes(item) ? 'border-primary bg-primary/10' : ''}`}>
-          <span className="text-[11px] font-medium text-foreground">{item}</span>
-        </button>
-      ))}
+      {items.map(item => {
+        const isSelected = selected.includes(item);
+
+        return (
+          <button
+            key={item}
+            type="button"
+            data-selected={isSelected}
+            aria-pressed={isSelected}
+            onClick={() => onToggle(item)}
+            className="compact-btn py-2 text-left"
+          >
+            <span className="text-[11px] font-medium text-foreground">{item}</span>
+          </button>
+        );
+      })}
     </div>
   );
 
