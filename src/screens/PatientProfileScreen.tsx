@@ -2,13 +2,8 @@ import { useState } from 'react';
 import { useAppStore, EMPTY_PROFILE } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { toast } from 'sonner';
-import type { 
+import type {
   PatientProfile, SexAtBirth, ChiefComplaint, IntakeStep, SurgicalEntry, AllergyEntry,
-} from '@/types';
-import { 
-  PMH_ENDOCRINE, PMH_CARDIOVASCULAR, PMH_NEUROLOGICAL, PMH_KIDNEY_UROLOGIC, PMH_CANCER, PMH_OTHER,
-  SURG_UROLOGIC, SURG_GENERAL, FAMILY_HX_OPTIONS,
-  DIABETES_MEDS, BLOOD_THINNERS, UROLOGIC_MEDS, SUPPLEMENTS,
 } from '@/types';
 import { format } from 'date-fns';
 import { CalendarIcon, Plus, X } from 'lucide-react';
@@ -29,6 +24,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
   const t = useTranslation();
   
   const SECTIONS = [t.profile.demographics, t.profile.complaints, t.profile.medicalHx, t.profile.surgicalHx, t.profile.familyHx, t.profile.medications, t.profile.allergies];
+  const profileOptions = t.profileOptions;
   
   const [profile, setProfile] = useState<PatientProfile>(existingProfile || EMPTY_PROFILE);
   const [section, setSection] = useState(0);
@@ -224,21 +220,21 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.pastMedicalHistory}</h2>
             <SectionLabel>{t.profile.endocrine}</SectionLabel>
-            <CheckboxGrid items={PMH_ENDOCRINE} selected={profile.pastMedicalHistory.endocrine} onToggle={(item) => togglePMH('endocrine', item)} />
+            <CheckboxGrid items={profileOptions.pmh.endocrine} selected={profile.pastMedicalHistory.endocrine} onToggle={(item) => togglePMH('endocrine', item)} />
             <SectionLabel>{t.profile.cardiovascular}</SectionLabel>
-            <CheckboxGrid items={PMH_CARDIOVASCULAR} selected={profile.pastMedicalHistory.cardiovascular} onToggle={(item) => togglePMH('cardiovascular', item)} />
+            <CheckboxGrid items={profileOptions.pmh.cardiovascular} selected={profile.pastMedicalHistory.cardiovascular} onToggle={(item) => togglePMH('cardiovascular', item)} />
             <SectionLabel>{t.profile.neurological}</SectionLabel>
-            <CheckboxGrid items={PMH_NEUROLOGICAL} selected={profile.pastMedicalHistory.neurological} onToggle={(item) => togglePMH('neurological', item)} />
+            <CheckboxGrid items={profileOptions.pmh.neurological} selected={profile.pastMedicalHistory.neurological} onToggle={(item) => togglePMH('neurological', item)} />
             <SectionLabel>{t.profile.kidneyUrologic}</SectionLabel>
-            <CheckboxGrid items={PMH_KIDNEY_UROLOGIC} selected={profile.pastMedicalHistory.kidneyUrologic} onToggle={(item) => togglePMH('kidneyUrologic', item)} />
+            <CheckboxGrid items={profileOptions.pmh.kidneyUrologic} selected={profile.pastMedicalHistory.kidneyUrologic} onToggle={(item) => togglePMH('kidneyUrologic', item)} />
             <SectionLabel>{t.profile.cancerHistory}</SectionLabel>
-            <CheckboxGrid items={PMH_CANCER} selected={profile.pastMedicalHistory.cancer} onToggle={(item) => togglePMH('cancer', item)} />
+            <CheckboxGrid items={profileOptions.pmh.cancer} selected={profile.pastMedicalHistory.cancer} onToggle={(item) => togglePMH('cancer', item)} />
             <input value={profile.pastMedicalHistory.cancerOther}
               onChange={(e) => setProfile(p => ({ ...p, pastMedicalHistory: { ...p.pastMedicalHistory, cancerOther: e.target.value } }))}
               className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm mt-1.5"
               placeholder={t.profile.otherCancer} />
             <SectionLabel>{t.profile.otherPMH}</SectionLabel>
-            <CheckboxGrid items={PMH_OTHER} selected={profile.pastMedicalHistory.other} onToggle={(item) => togglePMH('other', item)} />
+            <CheckboxGrid items={profileOptions.pmh.other} selected={profile.pastMedicalHistory.other} onToggle={(item) => togglePMH('other', item)} />
           </>
         )}
 
@@ -246,7 +242,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.surgicalHistory}</h2>
             <SectionLabel>{t.profile.urologicSurgeries}</SectionLabel>
-            {SURG_UROLOGIC.map(name => {
+            {profileOptions.surgery.urologic.map(name => {
               const entry = profile.pastSurgicalHistory.urologic.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
@@ -263,7 +259,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               );
             })}
             <SectionLabel>{t.profile.generalSurgeries}</SectionLabel>
-            {SURG_GENERAL.map(name => {
+            {profileOptions.surgery.general.map(name => {
               const entry = profile.pastSurgicalHistory.general.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
@@ -276,7 +272,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
                       <input value={entry.year || ''} onChange={(e) => updateSurgeryYear('general', name, e.target.value)}
                         className="flex-1 p-2 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary"
                         placeholder={t.profile.yearOptional} />
-                      {name === 'Hernia Repair' && (
+                      {name === profileOptions.surgery.general[0] && (
                         <button onClick={() => toggleSurgeryMesh('general', name)}
                           className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${entry.meshUsed ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>
                           {t.profile.mesh}
@@ -294,7 +290,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.familyHistory}</h2>
             <p className="text-xs text-muted-foreground">{t.profile.familyHxDesc}</p>
-            <CheckboxGrid items={FAMILY_HX_OPTIONS} selected={profile.familyHistory.conditions} onToggle={toggleFamilyHx} />
+            <CheckboxGrid items={profileOptions.familyHistory} selected={profile.familyHistory.conditions} onToggle={toggleFamilyHx} />
             <input value={profile.familyHistory.other}
               onChange={(e) => setProfile(p => ({ ...p, familyHistory: { ...p.familyHistory, other: e.target.value } }))}
               className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
@@ -308,7 +304,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             {hasDiabetes && (
               <>
                 <SectionLabel>{t.profile.diabetesMeds}</SectionLabel>
-                <CheckboxGrid items={DIABETES_MEDS} selected={profile.medications.diabetesMeds} onToggle={(item) => toggleMedArray('diabetesMeds', item)} />
+                <CheckboxGrid items={profileOptions.medications.diabetes} selected={profile.medications.diabetesMeds} onToggle={(item) => toggleMedArray('diabetesMeds', item)} />
                 <input value={profile.medications.diabetesMedsOther}
                   onChange={(e) => setProfile(p => ({ ...p, medications: { ...p.medications, diabetesMedsOther: e.target.value } }))}
                   className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm mt-1.5"
@@ -316,7 +312,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               </>
             )}
             <SectionLabel>{t.profile.bloodThinners}</SectionLabel>
-            <CheckboxGrid items={BLOOD_THINNERS} selected={profile.medications.bloodThinners} onToggle={(item) => toggleMedArray('bloodThinners', item)} />
+            <CheckboxGrid items={profileOptions.medications.bloodThinners} selected={profile.medications.bloodThinners} onToggle={(item) => toggleMedArray('bloodThinners', item)} />
             <div className="grid grid-cols-2 gap-2 mt-1.5">
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.bpMeds}</label>
@@ -333,7 +329,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               </div>
             </div>
             <SectionLabel>{t.profile.urologicMeds}</SectionLabel>
-            <CheckboxGrid items={UROLOGIC_MEDS} selected={profile.medications.urologicMeds} onToggle={(item) => toggleMedArray('urologicMeds', item)} cols={1} />
+            <CheckboxGrid items={profileOptions.medications.urologic} selected={profile.medications.urologicMeds} onToggle={(item) => toggleMedArray('urologicMeds', item)} cols={1} />
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.otherPrescriptions}</label>
               <textarea value={profile.medications.otherPrescriptions}
@@ -342,7 +338,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
                 placeholder={t.profile.listOtherPrescriptions} />
             </div>
             <SectionLabel>{t.profile.supplements}</SectionLabel>
-            <CheckboxGrid items={SUPPLEMENTS} selected={profile.medications.supplements} onToggle={(item) => toggleMedArray('supplements', item)} />
+            <CheckboxGrid items={profileOptions.medications.supplements} selected={profile.medications.supplements} onToggle={(item) => toggleMedArray('supplements', item)} />
             <input value={profile.medications.supplementsOther}
               onChange={(e) => setProfile(p => ({ ...p, medications: { ...p.medications, supplementsOther: e.target.value } }))}
               className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm mt-1.5"

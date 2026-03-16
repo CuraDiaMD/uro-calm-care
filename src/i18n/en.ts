@@ -122,6 +122,28 @@ export const en = {
     complaintsError: 'Please select at least one chief complaint',
   },
 
+  profileOptions: {
+    pmh: {
+      endocrine: ['Type 1 Diabetes', 'Type 2 Diabetes'],
+      cardiovascular: ['Hypertension', 'Coronary artery disease', 'Heart failure', 'Atrial fibrillation'],
+      neurological: ['Stroke/TIA', "Parkinson’s disease", 'Multiple sclerosis', 'Spinal cord injury', 'Alzheimer’s disease / dementia'],
+      kidneyUrologic: ['Nephrolithiasis', 'Chronic kidney disease', 'Recurrent urinary tract infections', 'Benign prostatic hyperplasia'],
+      cancer: ['Prostate cancer', 'Bladder cancer', 'Kidney cancer', 'Testicular cancer', 'Pelvic radiotherapy / chemotherapy'],
+      other: ['Asthma / COPD / sleep apnea', 'Bleeding disorder', 'Crohn’s disease / ulcerative colitis'],
+    },
+    surgery: {
+      urologic: ['Prostate surgery', 'Kidney surgery', 'Bladder surgery', 'Vasectomy', 'Hysterectomy / Caesarean section', 'Pelvic floor repair'],
+      general: ['Hernia repair', 'Bowel surgery', 'Bariatric surgery'],
+    },
+    familyHistory: ['Prostate cancer', 'Bladder cancer', 'Kidney cancer', 'Nephrolithiasis'],
+    medications: {
+      diabetes: ['Insulin', 'Metformin', 'SGLT2 inhibitors', 'GLP-1 receptor agonists'],
+      bloodThinners: ['Aspirin', 'Clopidogrel (Plavix)', 'Warfarin (Coumadin)', 'Apixaban / Rivaroxaban'],
+      urologic: ['Tamsulosin (Flomax)', 'Finasteride', 'Dutasteride', 'Oxybutynin', 'Mirabegron', 'Tolterodine'],
+      supplements: ['Saw palmetto', 'Vitamin C / Calcium'],
+    },
+  },
+
   // Chief Complaint Labels
   chiefComplaints: {
     frequency: 'Urinary Frequency',
