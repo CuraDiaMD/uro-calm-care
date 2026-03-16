@@ -131,7 +131,7 @@ export function CalendarScreen() {
             <Droplets className="w-3.5 h-3.5 text-secondary" />
             <span className="text-xs font-medium text-foreground">Intake</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">{summary.totalIntake}</p>
+          <p className="text-3xl font-bold text-foreground">{summary.totalIntake}</p>
           <p className="text-xs text-muted-foreground">mL total</p>
         </div>
         
