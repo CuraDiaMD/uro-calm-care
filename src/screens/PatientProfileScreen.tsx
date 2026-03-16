@@ -395,8 +395,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
         {section === 6 && (
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.allergies}</h2>
-            <button onClick={() => setProfile(p => ({ ...p, allergies: { ...p.allergies, noKnownAllergies: !p.allergies.noKnownAllergies, entries: !p.allergies.noKnownAllergies ? [] : p.allergies.entries } }))}
-              className={`w-full compact-btn py-2.5 ${profile.allergies.noKnownAllergies ? 'border-primary bg-primary/10' : ''}`}>
+            <button
+              type="button"
+              data-selected={profile.allergies.noKnownAllergies}
+              aria-pressed={profile.allergies.noKnownAllergies}
+              onClick={() => setProfile(p => ({ ...p, allergies: { ...p.allergies, noKnownAllergies: !p.allergies.noKnownAllergies, entries: !p.allergies.noKnownAllergies ? [] : p.allergies.entries } }))}
+              className="w-full compact-btn py-2.5"
+            >
               <span className="text-sm font-medium text-foreground">{t.profile.nkda}</span>
             </button>
             {!profile.allergies.noKnownAllergies && (
