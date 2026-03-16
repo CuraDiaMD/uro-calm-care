@@ -88,7 +88,7 @@ export function CalendarScreen() {
           >
             <ChevronLeft className="w-4 h-4 text-muted-foreground" />
           </button>
-          <h2 className="text-sm font-semibold text-foreground">
+          <h2 className="text-base font-semibold text-foreground">
             {format(selectedDate, 'MMMM yyyy')}
           </h2>
           <button
