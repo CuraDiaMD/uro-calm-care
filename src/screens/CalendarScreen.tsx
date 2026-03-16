@@ -68,7 +68,7 @@ export function CalendarScreen() {
         <div className="flex items-center gap-2 flex-1">
           <Sun className="w-4 h-4 text-warning" />
           <div className="flex-1">
-            <label className="text-[10px] text-muted-foreground">Wake</label>
+            <label className="text-xs text-muted-foreground">Wake</label>
             <input
               type="time"
               value={wakeTime || '06:00'}
