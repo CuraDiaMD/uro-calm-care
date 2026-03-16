@@ -54,16 +54,16 @@ export function ReviewAndApproveScreen() {
               {pmhItems.length > 0 && (
                 <p><span className="text-foreground font-medium">Medical Hx:</span> {pmhItems.join(', ')}</p>
               )}
-              {patientProfile.pastSurgicalHistory.urologic.length + patientProfile.pastSurgicalHistory.general.length > 0 && (
+              {patientProfile.pastSurgicalHistory && (patientProfile.pastSurgicalHistory.urologic?.length || 0) + (patientProfile.pastSurgicalHistory.general?.length || 0) > 0 && (
                 <p><span className="text-foreground font-medium">Surgical Hx:</span> {[
-                  ...patientProfile.pastSurgicalHistory.urologic,
-                  ...patientProfile.pastSurgicalHistory.general,
+                  ...(patientProfile.pastSurgicalHistory.urologic || []),
+                  ...(patientProfile.pastSurgicalHistory.general || []),
                 ].map(e => e.year ? `${e.name} (${e.year})` : e.name).join(', ')}</p>
               )}
-              {patientProfile.allergies.noKnownAllergies && (
+              {patientProfile.allergies?.noKnownAllergies && (
                 <p><span className="text-foreground font-medium">Allergies:</span> NKDA</p>
               )}
-              {patientProfile.allergies.entries.length > 0 && (
+              {(patientProfile.allergies?.entries?.length || 0) > 0 && (
                 <p><span className="text-foreground font-medium">Allergies:</span> {patientProfile.allergies.entries.map(a => a.allergen).join(', ')}</p>
               )}
             </div>
