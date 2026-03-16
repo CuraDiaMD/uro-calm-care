@@ -1,31 +1,61 @@
-import { Droplets, Activity, AlertCircle } from 'lucide-react';
+import { Droplets, Activity, AlertCircle, Moon, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { format, isSameDay } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 
+const formatDiaryDate = (date: Date) => {
+  const day = `${date.getDate()}`.padStart(2, '0');
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
+
 export function CalendarScreen() {
   const intakeEntries = useAppStore((state) => state.intakeEntries);
   const voidingEntries = useAppStore((state) => state.voidingEntries);
   const leakageEntries = useAppStore((state) => state.leakageEntries);
+  const diaryStartDate = useAppStore((state) => state.diaryStartDate);
   const selectedDate = useAppStore((state) => state.selectedDiaryDate);
   const sleepTime = useAppStore((state) => state.sleepTime);
   const wakeTime = useAppStore((state) => state.wakeTime);
   const setSleepWakeTimes = useAppStore((state) => state.setSleepWakeTimes);
+  const getDiaryDaysCompleted = useAppStore((state) => state.getDiaryDaysCompleted);
   const getSummaryForDate = useAppStore((state) => state.getSummaryForDate);
   const language = useAppStore((state) => state.language);
   const t = useTranslation();
-
+  
+  const daysCompleted = getDiaryDaysCompleted();
   const locale = language === 'fr' ? frLocale : undefined;
   const dayIntakes = intakeEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
   const dayVoidings = voidingEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
   const dayLeakages = leakageEntries.filter(e => isSameDay(new Date(e.timestamp), selectedDate));
   const summary = getSummaryForDate(selectedDate);
   const hasLeakage = summary.leakageCount > 0 || summary.totalLeakage > 0;
-
+  
   return (
     <div className="screen-container gap-4">
-      <div className="compact-card grid grid-cols-2 gap-3 flex-shrink-0">
+      {diaryStartDate && (
+        <div className="compact-card flex-shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-base font-semibold text-foreground">{t.diary.diaryProgress}</h2>
+            <span className="text-xs font-medium text-primary">{Math.min(daysCompleted, 3)}/3 {t.diary.days}</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${(Math.min(daysCompleted, 3) / 3) * 100}%` }} />
+          </div>
+          {daysCompleted >= 3 && (
+            <p className="text-xs text-success mt-1.5 font-medium">{t.diary.diaryComplete}</p>
+          )}
+        </div>
+      )}
+
+      <div className="compact-card grid grid-cols-3 gap-3 flex-shrink-0">
+        <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
+          <label className="text-[10px] uppercase tracking-wide text-muted-foreground">Date</label>
+          <p className="text-sm font-semibold text-foreground">{formatDiaryDate(new Date(selectedDate))}</p>
+        </div>
         <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
           <label className="text-[10px] uppercase tracking-wide text-muted-foreground">{t.calendar.wake}</label>
           <input type="time" value={wakeTime || '06:00'} onChange={(e) => setSleepWakeTimes(sleepTime || '22:00', e.target.value)}
@@ -37,7 +67,7 @@ export function CalendarScreen() {
             className="w-full text-sm font-semibold text-foreground bg-transparent outline-none" />
         </div>
       </div>
-
+      
       <div className="grid grid-cols-2 gap-2 flex-shrink-0">
         <div className="compact-card">
           <div className="flex items-center gap-1.5 mb-1">
