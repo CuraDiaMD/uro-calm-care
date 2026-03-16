@@ -116,8 +116,8 @@ export function CalendarScreen() {
                     : 'hover:bg-muted'
                 }`}
               >
-                <p className="text-[9px] uppercase font-medium opacity-70">{format(date, 'EEE')}</p>
-                <p className="text-base font-semibold">{format(date, 'd')}</p>
+                <p className="text-[10px] uppercase font-medium opacity-70">{format(date, 'EEE')}</p>
+                <p className="text-lg font-semibold">{format(date, 'd')}</p>
               </button>
             );
           })}
