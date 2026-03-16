@@ -385,4 +385,4 @@ export const en = {
   },
 } as const;
 
-export type TranslationKeys = typeof en;
+export type { TranslationSchema } from './types';

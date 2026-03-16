@@ -1,6 +1,6 @@
-import type { TranslationKeys } from './en';
+import type { TranslationSchema } from './types';
 
-export const fr: TranslationKeys = {
+export const fr: TranslationSchema = {
   // Navigation
   nav: {
     home: 'Accueil',
