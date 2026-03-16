@@ -277,8 +277,13 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               const entry = profile.pastSurgicalHistory.urologic.find(e => e.name === name);
               return (
                 <div key={name} className="space-y-1 mb-2">
-                  <button onClick={() => toggleSurgery('urologic', name)}
-                    className={`w-full compact-btn py-2 text-left ${entry ? 'border-primary bg-primary/10' : ''}`}>
+                  <button
+                    type="button"
+                    data-selected={!!entry}
+                    aria-pressed={!!entry}
+                    onClick={() => toggleSurgery('urologic', name)}
+                    className="w-full compact-btn py-2 text-left"
+                  >
                     <span className="text-[11px] font-medium text-foreground">{name}</span>
                   </button>
                   {entry && (
