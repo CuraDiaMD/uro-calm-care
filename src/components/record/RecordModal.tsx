@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Droplet, Coffee, CupSoda, Citrus, Beer, GlassWater } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { VOLUME_PRESETS, URGE_SCALE_LABELS, type BeverageType, type LeakageSize, type LeakageType, type RecordTab } from '@/types';
+import type { DailySymptomCheck } from '@/types';
 import { toast } from 'sonner';
 
 const beverages: { type: BeverageType; icon: typeof Droplet; label: string }[] = [
