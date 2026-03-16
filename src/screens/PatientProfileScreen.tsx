@@ -2,13 +2,8 @@ import { useState } from 'react';
 import { useAppStore, EMPTY_PROFILE } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { toast } from 'sonner';
-import type { 
+import type {
   PatientProfile, SexAtBirth, ChiefComplaint, IntakeStep, SurgicalEntry, AllergyEntry,
-} from '@/types';
-import { 
-  PMH_ENDOCRINE, PMH_CARDIOVASCULAR, PMH_NEUROLOGICAL, PMH_KIDNEY_UROLOGIC, PMH_CANCER, PMH_OTHER,
-  SURG_UROLOGIC, SURG_GENERAL, FAMILY_HX_OPTIONS,
-  DIABETES_MEDS, BLOOD_THINNERS, UROLOGIC_MEDS, SUPPLEMENTS,
 } from '@/types';
 import { format } from 'date-fns';
 import { CalendarIcon, Plus, X } from 'lucide-react';
