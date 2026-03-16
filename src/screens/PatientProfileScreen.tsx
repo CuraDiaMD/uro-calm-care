@@ -290,7 +290,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
           <>
             <h2 className="text-lg font-semibold text-foreground">{t.profile.familyHistory}</h2>
             <p className="text-xs text-muted-foreground">{t.profile.familyHxDesc}</p>
-            <CheckboxGrid items={FAMILY_HX_OPTIONS} selected={profile.familyHistory.conditions} onToggle={toggleFamilyHx} />
+            <CheckboxGrid items={profileOptions.familyHistory} selected={profile.familyHistory.conditions} onToggle={toggleFamilyHx} />
             <input value={profile.familyHistory.other}
               onChange={(e) => setProfile(p => ({ ...p, familyHistory: { ...p.familyHistory, other: e.target.value } }))}
               className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
@@ -304,7 +304,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             {hasDiabetes && (
               <>
                 <SectionLabel>{t.profile.diabetesMeds}</SectionLabel>
-                <CheckboxGrid items={DIABETES_MEDS} selected={profile.medications.diabetesMeds} onToggle={(item) => toggleMedArray('diabetesMeds', item)} />
+                <CheckboxGrid items={profileOptions.medications.diabetes} selected={profile.medications.diabetesMeds} onToggle={(item) => toggleMedArray('diabetesMeds', item)} />
                 <input value={profile.medications.diabetesMedsOther}
                   onChange={(e) => setProfile(p => ({ ...p, medications: { ...p.medications, diabetesMedsOther: e.target.value } }))}
                   className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm mt-1.5"
@@ -312,7 +312,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               </>
             )}
             <SectionLabel>{t.profile.bloodThinners}</SectionLabel>
-            <CheckboxGrid items={BLOOD_THINNERS} selected={profile.medications.bloodThinners} onToggle={(item) => toggleMedArray('bloodThinners', item)} />
+            <CheckboxGrid items={profileOptions.medications.bloodThinners} selected={profile.medications.bloodThinners} onToggle={(item) => toggleMedArray('bloodThinners', item)} />
             <div className="grid grid-cols-2 gap-2 mt-1.5">
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.bpMeds}</label>
@@ -329,7 +329,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
               </div>
             </div>
             <SectionLabel>{t.profile.urologicMeds}</SectionLabel>
-            <CheckboxGrid items={UROLOGIC_MEDS} selected={profile.medications.urologicMeds} onToggle={(item) => toggleMedArray('urologicMeds', item)} cols={1} />
+            <CheckboxGrid items={profileOptions.medications.urologic} selected={profile.medications.urologicMeds} onToggle={(item) => toggleMedArray('urologicMeds', item)} cols={1} />
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.otherPrescriptions}</label>
               <textarea value={profile.medications.otherPrescriptions}
@@ -338,7 +338,7 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
                 placeholder={t.profile.listOtherPrescriptions} />
             </div>
             <SectionLabel>{t.profile.supplements}</SectionLabel>
-            <CheckboxGrid items={SUPPLEMENTS} selected={profile.medications.supplements} onToggle={(item) => toggleMedArray('supplements', item)} />
+            <CheckboxGrid items={profileOptions.medications.supplements} selected={profile.medications.supplements} onToggle={(item) => toggleMedArray('supplements', item)} />
             <input value={profile.medications.supplementsOther}
               onChange={(e) => setProfile(p => ({ ...p, medications: { ...p.medications, supplementsOther: e.target.value } }))}
               className="w-full p-2.5 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm mt-1.5"
