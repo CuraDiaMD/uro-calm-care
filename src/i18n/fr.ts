@@ -267,7 +267,7 @@ export const fr: TranslationSchema = {
     tip: 'Conseil :',
     tipText: 'Gardez un verre mesureur près des toilettes. La précision compte plus que l\'estimation — même des volumes approximatifs aident votre équipe soignante.',
     startDiary: 'Commencer le journal',
-    diaryProgress: 'Progression du journal de 3 jours',
+    diaryProgress: 'Progression du journal',
     days: 'jours',
     diaryComplete: '✅ Journal complété ! Vous pouvez réviser et soumettre.',
   },
