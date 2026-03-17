@@ -23,7 +23,7 @@ export const en = {
 
   // Magic Link Landing
   landing: {
-    welcome: 'Welcome to Uro-OS',
+    welcome: 'Welcome',
     description: 'Your clinic has invited you to complete a pre-visit intake. This will help your care team understand your symptoms better before your appointment.',
     whatToExpect: 'What to expect:',
     step1: 'Consent & privacy preferences',
