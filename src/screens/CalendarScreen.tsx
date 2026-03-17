@@ -122,7 +122,7 @@ export function CalendarScreen() {
             </div>
           )}
           <div className="flex items-center gap-1.5 mb-1 pr-10">
-            <Activity className="w-3.5 h-3.5 text-primary" />
+            <Toilet className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs font-medium text-foreground">{t.calendar.voiding}</span>
           </div>
           <p className="text-3xl font-bold text-foreground">{summary.totalVoided}</p>
