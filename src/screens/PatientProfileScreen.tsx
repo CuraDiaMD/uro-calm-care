@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppStore, EMPTY_PROFILE } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { toast } from 'sonner';
@@ -6,12 +6,61 @@ import type {
   PatientProfile, SexAtBirth, ChiefComplaint, IntakeStep, SurgicalEntry, AllergyEntry,
 } from '@/types';
 import { Plus, X } from 'lucide-react';
-import { DateOfBirthPicker } from '@/components/forms/DateOfBirthPicker';
+import { Input } from '@/components/ui/input';
 
 interface PatientProfileScreenProps {
   isEditMode?: boolean;
   onEditComplete?: () => void;
 }
+
+const formatDobDigits = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+  const parts = [];
+
+  if (digits.length > 0) parts.push(digits.slice(0, 2));
+  if (digits.length > 2) parts.push(digits.slice(2, 4));
+  if (digits.length > 4) parts.push(digits.slice(4, 8));
+
+  return parts.join(' / ');
+};
+
+const parseDobValue = (value: string) => {
+  const digits = value.replace(/\D/g, '');
+
+  if (digits.length !== 8) return null;
+
+  const day = Number(digits.slice(0, 2));
+  const month = Number(digits.slice(2, 4));
+  const year = Number(digits.slice(4, 8));
+
+  if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) return null;
+  if (month < 1 || month > 12 || year < 1900) return null;
+
+  const parsedDate = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  if (
+    parsedDate.getFullYear() !== year ||
+    parsedDate.getMonth() !== month - 1 ||
+    parsedDate.getDate() !== day ||
+    parsedDate > today
+  ) {
+    return null;
+  }
+
+  return parsedDate;
+};
+
+const formatDobDate = (value: Date | null) => {
+  if (!value) return '';
+
+  const day = String(value.getDate()).padStart(2, '0');
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const year = String(value.getFullYear());
+
+  return `${day} / ${month} / ${year}`;
+};
 
 export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProfileScreenProps = {}) {
   const existingProfile = useAppStore((state) => state.patientProfile);
@@ -24,6 +73,11 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
   
   const [profile, setProfile] = useState<PatientProfile>(existingProfile || EMPTY_PROFILE);
   const [section, setSection] = useState(0);
+  const [dobInput, setDobInput] = useState(() => formatDobDate((existingProfile || EMPTY_PROFILE).dateOfBirth));
+
+  useEffect(() => {
+    setDobInput(formatDobDate(profile.dateOfBirth));
+  }, [profile.dateOfBirth]);
   
   const updateField = <K extends keyof PatientProfile>(key: K, value: PatientProfile[K]) => {
     setProfile(p => ({ ...p, [key]: value }));
