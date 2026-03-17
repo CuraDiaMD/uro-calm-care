@@ -159,27 +159,11 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             </div>
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.dateOfBirth}</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !profile.dateOfBirth && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {profile.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : <span>{t.profile.pickDate}</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    captionLayout="dropdown"
-                    fromYear={1900}
-                    toYear={new Date().getFullYear()}
-                    defaultMonth={profile.dateOfBirth ? new Date(profile.dateOfBirth) : new Date(2006, 0)}
-                    selected={profile.dateOfBirth ? new Date(profile.dateOfBirth) : undefined}
-                    onSelect={(date) => updateField('dateOfBirth', date || null)}
-                    disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <DateOfBirthPicker
+                value={profile.dateOfBirth}
+                onChange={(date) => updateField('dateOfBirth', date)}
+                placeholder={t.profile.pickDate}
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.sexAtBirth} *</label>
