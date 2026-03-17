@@ -213,10 +213,17 @@ export function PatientProfileScreen({ isEditMode, onEditComplete }: PatientProf
             </div>
             <div>
               <label className="text-xs font-medium text-foreground mb-1 block">{t.profile.dateOfBirth}</label>
-              <DateOfBirthPicker
-                value={profile.dateOfBirth}
-                onChange={(date) => updateField('dateOfBirth', date)}
-                placeholder={t.profile.pickDate}
+              <Input
+                value={dobInput}
+                onChange={(e) => {
+                  const formattedValue = formatDobDigits(e.target.value);
+                  setDobInput(formattedValue);
+                  updateField('dateOfBirth', parseDobValue(formattedValue));
+                }}
+                inputMode="numeric"
+                autoComplete="bday"
+                maxLength={14}
+                placeholder="DD / MM / YYYY"
               />
             </div>
             <div>
