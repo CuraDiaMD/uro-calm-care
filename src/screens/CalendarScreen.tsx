@@ -1,4 +1,4 @@
-import { Activity, AlertCircle, CalendarDays, Droplets, Plus, Sun } from 'lucide-react';
+import { AlertCircle, CalendarDays, Droplets, Plus, Toilet, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { format, isSameDay } from 'date-fns';
