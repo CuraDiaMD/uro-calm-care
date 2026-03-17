@@ -1,47 +1,29 @@
 
-Goal: replace the custom-looking DOB calendar dropdown styling with a more standard pre-existing date picker experience that still supports quick year selection.
 
-What I found
-- The DOB picker already uses the shared `Calendar` wrapper in `src/components/ui/calendar.tsx`.
-- The odd visuals are likely coming from the current custom dropdown classNames inside that shared wrapper:
-  - `caption_dropdowns`
-  - `dropdown`
-  - `dropdown_month`
-  - `dropdown_year`
-- The DOB field in `src/screens/PatientProfileScreen.tsx` is already configured for year selection with `captionLayout="dropdown"`, `fromYear={1900}`, and `toYear={currentYear}`.
-- No other screen is using the dropdown caption variant right now, so this can be improved safely without broad UI impact.
+## Fix: Voiding Summary Not Updating
 
-Plan
-1. Inspect the supported `react-day-picker` v8 dropdown caption API
-- Verify the recommended built-in caption/dropdown behavior and class hooks for the installed version.
-- Confirm whether the cleanest option is:
-  - using native dropdowns with lighter styling, or
-  - using the library’s standard caption layout with minimal overrides.
+### Root Cause
+In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
 
-2. Simplify the shared calendar styling
-- Update `src/components/ui/calendar.tsx` so dropdown captions use a more standard, pre-existing visual treatment instead of the current heavily customized look.
-- Keep the core shadcn calendar layout intact:
-  - same day grid
-  - same popover behavior
-  - same pointer-events handling
-- Reduce or remove custom dropdown-specific classes that are causing the “weird” appearance.
+### Solution
+Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
 
-3. Keep the DOB picker on the standard year-select mode
-- In `src/screens/PatientProfileScreen.tsx`, continue using the existing mini popover calendar with:
-  - `captionLayout="dropdown"`
-  - wide DOB year range
-  - current disabled rules
-- If needed, adjust only DOB-specific props like `defaultMonth` so the picker opens in a practical year without affecting other calendars.
+### File Change: `src/components/home/DailySummaryCard.tsx`
 
-4. Validate consistency with the rest of the app
-- Ensure the revised picker still feels like a native/shadcn-style calendar rather than a bespoke control.
-- Preserve the current compact clinical-form layout and localized date display.
+Replace the current selectors (lines 5-7):
+```typescript
+const getTodaySummary = useAppStore((state) => state.getTodaySummary);
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = getTodaySummary();
+```
 
-Files likely involved
-- `src/components/ui/calendar.tsx`
-- `src/screens/PatientProfileScreen.tsx`
+With:
+```typescript
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = useAppStore((state) => state.getTodaySummary());
+```
 
-Expected result
-- Date of Birth still opens a mini calendar popover.
-- Users can choose month and year quickly.
-- The calendar looks cleaner and more standard, without the strange custom dropdown visuals.
+By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
+
+This is a one-line fix -- no other files need to change.
+
