@@ -265,7 +265,7 @@ export const en = {
     tip: 'Tip:',
     tipText: 'Keep a measuring cup near the toilet. Accuracy matters more than guessing — even approximate volumes help your care team.',
     startDiary: 'Start Diary',
-    diaryProgress: '3-Day Diary Progress',
+    diaryProgress: 'Diary Progress',
     days: 'days',
     diaryComplete: '✅ Diary complete! You can review and submit.',
   },
