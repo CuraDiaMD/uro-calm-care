@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarDays, Droplets, Plus, Toilet, Sun } from 'lucide-react';
+import { AlertCircle, CalendarDays, Droplets, Moon, Plus, Toilet, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useTranslation } from '@/i18n';
 import { format, isSameDay } from 'date-fns';
@@ -79,7 +79,10 @@ export function CalendarScreen() {
 
       <div className="grid grid-cols-2 gap-3 flex-shrink-0">
         <div className="compact-card rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground">{t.calendar.wake}</label>
+          <label className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <Sun className="h-3 w-3 text-primary" />
+            <span>{t.calendar.wake}</span>
+          </label>
           <input
             type="time"
             value={wakeTime || '06:00'}
@@ -88,7 +91,10 @@ export function CalendarScreen() {
           />
         </div>
         <div className="compact-card rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-14 flex flex-col justify-center">
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground">{t.calendar.sleep}</label>
+          <label className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <Moon className="h-3 w-3 text-secondary" />
+            <span>{t.calendar.sleep}</span>
+          </label>
           <input
             type="time"
             value={sleepTime || '22:00'}
