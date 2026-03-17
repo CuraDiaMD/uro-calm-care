@@ -25,7 +25,7 @@ export const fr: TranslationSchema = {
 
   // Magic Link Landing
   landing: {
-    welcome: 'Bienvenue sur Uro-OS',
+    welcome: 'Bienvenue',
     description: 'Votre clinique vous invite à remplir un formulaire pré-visite. Cela aidera votre équipe soignante à mieux comprendre vos symptômes avant votre rendez-vous.',
     whatToExpect: 'Ce qui vous attend :',
     step1: 'Consentement et préférences de confidentialité',
