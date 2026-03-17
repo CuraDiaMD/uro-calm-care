@@ -1,29 +1,38 @@
 
+Goal: add a small sun icon inside the Wake card and a small moon icon inside the Sleep card as lightweight visual cues, without changing the current layout significantly.
 
-## Fix: Voiding Summary Not Updating
+What I found
+- The wake/sleep rectangles are in `src/screens/CalendarScreen.tsx`.
+- The Wake card currently has only a text label and time input.
+- The Sleep card currently has only a text label and time input.
+- `lucide-react` is already used in this file, and `Sun` is already imported.
+- The existing cards use a compact muted style, so the icons should stay subtle and aligned with the label row.
 
-### Root Cause
-In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
+Plan
+1. Update the icon imports in `src/screens/CalendarScreen.tsx`
+- Add `Moon` to the existing lucide import list.
 
-### Solution
-Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
+2. Add a small icon to each label row
+- Wake card: place a small `Sun` icon beside the Wake label.
+- Sleep card: place a small `Moon` icon beside the Sleep label.
 
-### File Change: `src/components/home/DailySummaryCard.tsx`
+3. Keep the styling minimal and consistent
+- Use a tiny icon size matching the compact UI.
+- Apply muted/accented colors so the icons act as cues, not dominant elements.
+- Keep the input alignment and card height unchanged.
 
-Replace the current selectors (lines 5-7):
-```typescript
-const getTodaySummary = useAppStore((state) => state.getTodaySummary);
-const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
-const summary = getTodaySummary();
-```
+4. Preserve current behavior
+- Do not change the time input logic or state wiring.
+- Do not affect the surrounding diary summary layout.
 
-With:
-```typescript
-const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
-const summary = useAppStore((state) => state.getTodaySummary());
-```
+Expected result
+- Wake rectangle shows a small sun icon next to its label.
+- Sleep rectangle shows a small moon icon next to its label.
+- The cards feel slightly clearer visually while keeping the same compact design.
 
-By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
-
-This is a one-line fix -- no other files need to change.
-
+Technical details
+- File to update: `src/screens/CalendarScreen.tsx`
+- Likely change: convert each label area into a small `flex items-center gap-1` row containing icon + label text.
+- Suggested icon treatment:
+  - Wake: `Sun` with a subtle warning/amber tone
+  - Sleep: `Moon` with a subtle secondary/blue tone
