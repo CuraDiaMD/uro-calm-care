@@ -1,24 +1,29 @@
 
-Goal: change the demo password from `DIA-84842486` to `ESG2026`.
 
-What I found
-- The password is hardcoded in `src/components/PasswordGate.tsx` as:
-  `const DEMO_PASSWORD = "DIA-84842486";`
-- The password check happens in the same file inside `handleSubmit`.
-- Existing session behavior uses `sessionStorage` with `curadia-demo-access`, so users who already unlocked the app in the same browser session may remain allowed in until that session is cleared.
+## Fix: Voiding Summary Not Updating
 
-Plan
-1. Update `src/components/PasswordGate.tsx`
-- Replace the `DEMO_PASSWORD` value with `ESG2026`.
+### Root Cause
+In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
 
-2. Keep current behavior unchanged
-- Do not alter the password form UI, disclaimer, language toggle, or submit logic.
-- Do not change the session key unless you also want previously unlocked sessions to be forced to re-enter the new password.
+### Solution
+Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
 
-3. Optional follow-up decision
-- If you want the new password to apply immediately for anyone already unlocked in this browser session, also change the session key or reset session access logic.
-- If not, only the hardcoded password needs updating.
+### File Change: `src/components/home/DailySummaryCard.tsx`
 
-Expected result
-- New visitors must enter `ESG2026` to pass the password gate.
-- Current layout and bilingual behavior remain unchanged.
+Replace the current selectors (lines 5-7):
+```typescript
+const getTodaySummary = useAppStore((state) => state.getTodaySummary);
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = getTodaySummary();
+```
+
+With:
+```typescript
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = useAppStore((state) => state.getTodaySummary());
+```
+
+By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
+
+This is a one-line fix -- no other files need to change.
+

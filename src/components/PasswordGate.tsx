@@ -5,7 +5,7 @@ import curadiaLogo from "@/assets/curadia-logo.png";
 import { useAppStore } from "@/stores/appStore";
 import { useTranslation } from "@/i18n";
 
-const DEMO_PASSWORD = "DIA-84842486";
+const DEMO_PASSWORD = "ESG2026";
 const SESSION_KEY = "curadia-demo-access";
 
 interface PasswordGateProps {
