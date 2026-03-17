@@ -18,6 +18,7 @@ export const en = {
     incorrect: 'Incorrect password',
     continue: 'Continue',
     languageToggle: 'Switch language',
+    disclaimer: 'Demonstration Purposes Only: This environment is an interactive frontend prototype designed to showcase the user interface and planned user experience. No user input or data is captured, stored, or processed.',
   },
 
   // Magic Link Landing

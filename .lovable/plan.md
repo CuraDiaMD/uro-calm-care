@@ -1,35 +1,29 @@
 
-Goal: add a subtle bilingual disclaimer to the first password screen, shown in the active language, without disrupting the existing centered layout.
 
-What I found
-- The password screen is `src/components/PasswordGate.tsx`.
-- It already uses the i18n system via `useTranslation()` and has a language toggle.
-- Password gate copy currently lives under `passwordGate` in both `src/i18n/en.ts` and `src/i18n/fr.ts`.
+## Fix: Voiding Summary Not Updating
 
-Implementation plan
-1. Extend password-gate translations
-- Add a new translation key under `passwordGate` in both English and French for the disclaimer text.
-- Keep the copy exactly as provided, localized per language.
+### Root Cause
+In `DailySummaryCard.tsx`, the component selects `getTodaySummary` from the store using a Zustand selector. Since `getTodaySummary` is a stable function reference that never changes, Zustand's equality check determines nothing has changed, and the component does **not** re-render when new voiding entries are added.
 
-2. Render the disclaimer in `PasswordGate`
-- Insert a small text block near the top of the form, below the language toggle and above the logo or prompt.
-- Use subtle styling such as very small muted text, centered alignment, compact line height, and constrained width so it reads like a header notice rather than a warning banner.
+### Solution
+Change how `DailySummaryCard` subscribes to the store. Instead of selecting just the function, also subscribe to the underlying data arrays (`intakeEntries`, `voidingEntries`, `leakageEntries`) so Zustand knows to re-render when those change.
 
-3. Preserve current UX
-- Keep the language toggle behavior unchanged so the disclaimer switches instantly between EN/FR.
-- Avoid changing password logic, spacing rhythm, or overall gate flow beyond the added notice.
+### File Change: `src/components/home/DailySummaryCard.tsx`
 
-Design notes
-- Best fit is a lightweight paragraph, not an alert component.
-- Suggested visual treatment: `text-[10px]` or `text-xs`, `text-muted-foreground`, centered, with slightly tighter line-height and maybe a soft max width for readability.
-- This keeps it visible enough for compliance/demo context while still feeling subtle.
+Replace the current selectors (lines 5-7):
+```typescript
+const getTodaySummary = useAppStore((state) => state.getTodaySummary);
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = getTodaySummary();
+```
 
-Files to update
-- `src/components/PasswordGate.tsx`
-- `src/i18n/en.ts`
-- `src/i18n/fr.ts`
+With:
+```typescript
+const openRecordWithTab = useAppStore((state) => state.openRecordWithTab);
+const summary = useAppStore((state) => state.getTodaySummary());
+```
 
-Expected result
-- The first password page shows a discreet demo-only disclaimer.
-- The text appears in English or French based on the selected language.
-- The rest of the password screen remains visually consistent.
+By calling `getTodaySummary()` **inside** the selector, Zustand will compare the returned summary object each time the store updates. When entries change, the summary values change, triggering a re-render.
+
+This is a one-line fix -- no other files need to change.
+

@@ -60,6 +60,9 @@ const PasswordGate = ({ children }: PasswordGateProps) => {
           </button>
         </div>
 
+        <p className="max-w-[22rem] text-center text-[10px] leading-relaxed text-muted-foreground">
+          {t.passwordGate.disclaimer}
+        </p>
         <img src={curadiaLogo} alt="CuraDia" className="mb-2 h-36" />
         <p className="text-center text-sm text-muted-foreground">
           {t.passwordGate.prompt}
