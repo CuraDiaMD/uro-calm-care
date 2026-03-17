@@ -20,6 +20,7 @@ export const fr: TranslationSchema = {
     incorrect: 'Mot de passe incorrect',
     continue: 'Continuer',
     languageToggle: 'Changer de langue',
+    disclaimer: 'À des fins de démonstration uniquement : Cet environnement est un prototype frontend interactif conçu pour présenter l\'interface et l\'expérience utilisateur prévues. Aucune saisie ou donnée utilisateur n\'est capturée, stockée ou traitée.',
   },
 
   // Magic Link Landing
